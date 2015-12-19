@@ -1,0 +1,30 @@
+{
+  "name": "sphp",
+  "version": "0.3.1",
+  "description": "a snappy PHP execution module / middleware ",
+  "main": "sphp.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paragi/sphp.git"
+  },
+  "keywords": [
+    "fast",
+    "snappy",
+    "snap",
+    "cgi",
+    "execute",
+    "script",
+    "php",
+    "websocket",
+    "session"
+  ],
+  "author": "paragi <simon.riget@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/paragi/sphp/issues"
+  },
+  "homepage": "https://github.com/paragi/sphp#readme"
+}
