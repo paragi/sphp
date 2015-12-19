@@ -1,19 +1,19 @@
-Snappy PHP
-
-sPHP
-
+##Snappy PHP for node js
 a snappy PHP execution module / middleware 
 
+#Work in progress
+
+
 Features
-Snappy response time to PHP requests
-Serves Websocket requests
-Transferring node sessions to PHP 
-No dependencies
-Aim to mimic Apache mod_php global settings
-Highly configurable.
+* Snappy response time to PHP requests
+* Serves Websocket requests
+* Transferring node sessions to PHP 
+* No dependencies
+* Aim to mimic Apache mod_php global settings
+* Highly configurable.
 
 
-Install
+####Install
 
 npm install sphp
 
@@ -21,7 +21,7 @@ copy or link php_burner.php to working directory
 
 Set execution time to unlimited
 
-use
+####use
 
 
 
