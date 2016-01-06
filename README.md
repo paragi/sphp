@@ -1,8 +1,5 @@
 ##Snappy PHP for node js
-a snappy PHP execution module / middleware 
-
-#Work in progress
-
+a new snappy PHP execution module / middleware 
 
 Features
 * Snappy response time to PHP requests
