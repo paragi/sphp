@@ -1,0 +1,86 @@
+html {
+	height:100%;
+}
+
+*{
+	color: #FFEDBA;
+	border-color: #FFEDBA;
+	border-color: #FFEDBA;
+  font-size: 16pt;
+  font-family: serif, Times,"Times New Roman" ;
+}
+
+body{
+	margin: 0px;
+	background-color: #460918;
+	inner-height:100%;
+}
+
+.container{
+	border:2px solid #f0d988;
+	padding:3px;
+	border-radius:10px;
+	background-color: #460918;
+	background-repeat: no-repeat;
+	background-size:100% 100%;
+	box-shadow: 3px 3px 3px #291b2c;
+	float:left;
+	margin: 10px;
+}
+
+.tile{
+	position: static;
+	border:2px solid #f0d988;
+	padding:3px;
+	border-radius:10px;
+	background-color:rgba(50,10,10,0.5);
+	box-shadow: 3px 3px 3px #291b2c;
+	float:left;
+	margin: 10px;
+  transition: opacity 1s ease-in-out;
+}
+
+.tile:hover{
+	background-color:rgba(240,217,136,0.2);
+	cursor:pointer;
+}
+
+table td{ padding-right:5px;}
+table th{ text-align:left;}
+table tr:nth-child(even) {
+	background-color:rgba(240,217,136,0.2);
+}
+table .sel{
+	background-color:rgba(50,10,10,0.5);
+}
+table .sel:hover{
+	background-color:rgba(240,217,136,0.5);
+	cursor:pointer;
+}
+
+input, select {
+	border: 2px solid #f0d988;
+	padding: 1px;
+	margin: 3px;
+	border-radius:5px;
+	vertical-align: top;
+	background-color: #460918;
+	border-collapse: collapse;
+}
+
+button{
+	border: 2px solid #460918;
+	padding: 1px;
+	margin: 3px;
+	border-radius:5px;
+	vertical-align: top;
+	background-color: #f0d988;
+  color: #460918;
+	border-collapse: collapse;
+	cursor:pointer;
+}
+
+hr{border-color:#f0d988;}
+
+.withhoverbox {cursor:pointer;}
+
