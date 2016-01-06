@@ -21,10 +21,15 @@
     "websocket",
     "session"
   ],
-  "author": "paragi <simon.riget@gmail.com>",
+  "author": "Paragi Aps, Simon Rigét <simon.riget@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/paragi/sphp/issues"
   },
-  "homepage": "https://github.com/paragi/sphp#readme"
+  "homepage": "https://github.com/paragi/sphp#readme",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "ws": "^0.8.1"
+  }
 }
