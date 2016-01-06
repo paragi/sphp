@@ -2,30 +2,54 @@
 a new snappy PHP execution module / middleware 
 
 Features
-* Snappy response time to PHP requests
-* Serves Websocket requests
-* Transferring node sessions to PHP 
-* No dependencies
-* Aim to mimic Apache mod_php global settings
+* Priority to fast response time for PHP requests
+* Supports Websocket requests served by PHP scripts
+* Transferring node sessions control to PHP 
+* No dependencies (except for example)
+* mimic Apache mod_php population of $_SERVER
 * Highly configurable.
 
+Note:
+* File upload disabled at present.
 
 ####Install
 
     npm install sphp
 
-Then copy or link php_burner.php to working directory
 
-Set execution time to unlimited in php.ini (Preferably a local copy in working directory)
+####Use
 
-####use
+    // Attach sPHP to static file server
+    var sphp = require('sphp');
+    app.use(sphp.express('example/'));
 
-    server=require('express');
+To use it with sesion control and websockets, please look at the example files.
+
+####Configuration
+
+######docRoot (default: ./public)
+   sphp.docRoot='./my_files';
+
+######cgiEngine (Default: php-cgi)
+
+   sphp.cgiEngine='php-cgi';
+
+######minSpareWorkers (Default: 2)
+
+    sphp.minSpareWorkers=4;
+
+######maxWorkers (Default: 10)
+
+    sphp.maxWorkers=20;
+
+######stepDowntime (Default: 360 seconds)
+
+    sphp.stepDowntime=600;
 
 
-The goal of this project is to make a mechanism to serve PHP scripts with the best response time possible, while using nodes session control. 
+
+The goal of this project is to serve PHP scripts with the best response time possible, while using nodes session control. 
 It is achieved by pre-emptively spawning and loading of the PHP-CGI engine and holdning it there, until nedded.
 Also it was important to stay close to the Apache mod_php global settings, to avoid migrating problems.
-(A logical next step would be to utilise the fast CGI php engine, and let I handle the spawning of workers)
-Snappy PHP
 
+The foodprint is about 20MB / worker
