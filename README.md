@@ -58,6 +58,5 @@ This is time it takes before the number of workers, are reduced by one.
 ####Notes
 The goal of this project is to serve PHP scripts with the best response time possible, while using nodes session control. 
 It is achieved by pre-emptively spawning and loading of the PHP-CGI engine and holdning it there, until nedded.
-Also it was important to stay close to the Apache mod_php global settings, to avoid migrating problems.
 
 The foodprint is about 20MB / worker
