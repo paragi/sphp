@@ -28,6 +28,7 @@ To use it with sesion control and websockets, please look at the example files.
 ####Configuration
 
 ######docRoot (default: ./public)
+
    sphp.docRoot='./my_files';
 
 ######cgiEngine (Default: php-cgi)
