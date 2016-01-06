@@ -28,22 +28,29 @@ To use it with sesion control and websockets, please look at the example files.
 ####Configuration
 
 ######docRoot (default: ./public)
+Where to serve script files from. Might be relative or an absolute path.
 
-   sphp.docRoot='./my_files';
+    sphp.docRoot='./my_files';
 
 ######cgiEngine (Default: php-cgi)
+Specify wich binary file to use to execute PHP script
 
-   sphp.cgiEngine='php-cgi';
+    sphp.cgiEngine='php';
 
 ######minSpareWorkers (Default: 2)
+Define the minimum number of workers kept ready. 
+Note that when caling PHP scripts through websockets, an aditionan concurent worker is used. 
 
     sphp.minSpareWorkers=4;
 
 ######maxWorkers (Default: 10)
+The maximum number of workers allowed to start. This number will never be exceded. Request will be rejected.
 
     sphp.maxWorkers=20;
 
 ######stepDowntime (Default: 360 seconds)
+When the need arises, the number of workers kept ready are raised.
+This is time it takes before the number of workers, are reduced by one.
 
     sphp.stepDowntime=600;
 
