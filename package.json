@@ -1,7 +1,7 @@
 {
   "name": "sphp",
-  "version": "0.3.1",
-  "description": "a snappy PHP execution module / middleware",
+  "version": "0.3.2",
+  "description": "A snappy PHP execution module / middleware",
   "main": "sphp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,15 +11,15 @@
     "url": "git+https://github.com/paragi/sphp.git"
   },
   "keywords": [
-    "fast",
     "snappy",
     "snap",
-    "cgi",
     "execute",
     "script",
-    "php",
+    "cgi",
+    "session",
     "websocket",
-    "session"
+    "fast",
+    "php"
   ],
   "author": "Paragi Aps, Simon Rigét <simon.riget@gmail.com>",
   "license": "MIT",
@@ -28,11 +28,18 @@
   },
   "homepage": "https://github.com/paragi/sphp#readme",
   "dependencies": {
+    "express": "^4.13.3",
+    "express-session": "^1.12.1",
+    "body-parser": "^1.14.2",
+    "ws": "^0.8.1"
   },
   "devDependencies": {
     "express": "^4.13.3",
     "express-session": "^1.12.1",
     "body-parser": "^1.14.2",
     "ws": "^0.8.1"
+  },
+  "directories": {
+    "example": "example"
   }
 }
