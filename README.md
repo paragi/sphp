@@ -13,6 +13,7 @@ Features:
 
 Note:
 * File upload disabled at present.
+* Compatible with module: express, express-session, body-parser, ws
 
 ####Install
 
