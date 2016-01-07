@@ -84,7 +84,7 @@ $_SERVER['SERVER_SOFTWARE'] = "PHP Appilation Server using Node.js and WS Websoc
 $_SERVER['SERVER_SIGNATURE']="$_SERVER[SERVER_SOFTWARE] Server with $_SERVER[GATEWAY_INTERFACE] at ". @$request['header']['host'];
 
 // Servers session data
-$_SERVER['SESSION']=@$request['session'];
+$_SESSION=@$request['session'];
 
 // _GET
 if(is_array($request['query']))
@@ -112,7 +112,7 @@ $_REQUEST=(array)$_GET + (array)$_POST + (array)$_COOKIE;
     Go
 \* ======================================================================== */
 // Clean up
-unset($key,$val,$line,$request,$sw_name,$default_script,$path);
+unset($key,$val,$line,$request,$sw_name,$default_script,$path,$url);
 // echo print_r($GLOBALS,true)."</pre>";
 
 // Run script
