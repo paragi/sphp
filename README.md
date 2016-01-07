@@ -1,5 +1,5 @@
 ##Snappy PHP for node js
-A snappy PHP execution module / middleware 
+A snappy PHP module / middleware. 
 
 Features:
 * Middleware for node Express or stand alone php execution
@@ -13,12 +13,13 @@ Features:
 
 Note:
 * File upload disabled at present.
-* Compatible with module: express, express-session, body-parser, ws
+* Compatible with module: express 4.13.3, express-session 1.12.1, body-parser 1.14.2, ws 0.8.1
+* Since devDependencies dosen't work on all platforms (npm 3.4.0) these packages are included to make the example.js work. They should be removed in production.
+* php-cgi or other must be installed on the system.
 
 ####Install
 
     npm install sphp
-
 
 ####Use with express
 
@@ -69,8 +70,8 @@ Note:
       request.session.ip=request.client.remoteAddress;
       next();
     });
-    app.use(bodyParser.json());       // to support JSON-encoded bodies
-    app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodies
+    app.use(bodyParser.json());      
+    app.use(bodyParser.urlencoded({extended: true}));
 
     app.use(sphp.express('example/'));
     ws.on('connection',sphp.websocket(sessionOptions));
