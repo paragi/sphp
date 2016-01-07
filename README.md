@@ -2,13 +2,14 @@
 A new snappy PHP execution module / middleware 
 
 Features:
-* Middleware for node Express
-* Fast response time on PHP requests, favored over use of resources
-* Supports Websocket requests served by PHP scripts
-* Transfer of node session to PHP session
+* Middleware for node Express or stand alone php execution
+* Fast response time favored over use of resources
+* Websocket support: requests can be parsed a PHP scripts
+* Transfer of node session data to PHP $_SESSION
 * No dependencies (except for example)
-* Mimic of Apache mod_php population of $_SERVER
+* Mimic Apache mod_php population of $_SERVER
 * Highly configurable.
+* Comprehensive example of a server and a php websocket client
 
 Note:
 * File upload disabled at present.
@@ -32,7 +33,6 @@ Note:
 ####Use with ws (Websockets)
 
     var express = require('express');
-    var sessionStore = new expressSession.MemoryStore();
     var sphp = require('sphp');
     
     var app = express();
@@ -40,7 +40,7 @@ Note:
     var ws = new require('ws').Server({server: server});
     
     app.use(sphp.express('public/'));
-    ws.on('connection',sphp.websocket(sessionOptions));
+    ws.on('connection',sphp.websocket());
     app.use(express.static('public/'));
     
 ####Use with express-session
