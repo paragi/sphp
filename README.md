@@ -1,5 +1,5 @@
 ##Snappy PHP for node js
-A new snappy PHP execution module / middleware 
+A snappy PHP execution module / middleware 
 
 Features:
 * Middleware for node Express or stand alone php execution
