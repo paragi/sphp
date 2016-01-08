@@ -28,10 +28,6 @@
   },
   "homepage": "https://github.com/paragi/sphp#readme",
   "dependencies": {
-    "express": "^4.13.3",
-    "express-session": "^1.12.1",
-    "body-parser": "^1.14.2",
-    "ws": "^0.8.1"
   },
   "devDependencies": {
     "express": "^4.13.3",
@@ -39,6 +35,12 @@
     "body-parser": "^1.14.2",
     "ws": "^0.8.1"
   },
+  "peerDependencies":{
+    "express": "4.x",
+    "express-session": "1.x",
+    "body-parser": "1.x",
+    "ws": "0.x"
+  }
   "directories": {
     "example": "example"
   }

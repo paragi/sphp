@@ -5,15 +5,15 @@ Features:
 * Middleware for node Express or stand alone php execution
 * Fast response time favored over use of resources
 * Websocket support: requests can be parsed a PHP scripts
-* Transfer of node session data to PHP $_SESSION
+* Transfer of node session data to PHP's $_SESSION
 * No dependencies (except for example)
 * Mimic Apache mod_php population of $_SERVER
 * Highly configurable.
-* Comprehensive example of a server and a php websocket client
+* Comprehensive example of a server and a PHP websocket client
 
 Note:
 * File upload disabled at present.
-* Compatible with module: express 4.13.3, express-session 1.12.1, body-parser 1.14.2, ws 0.8.1
+* Compatible with module: express 4.13, express-session 1.12, body-parser 1.14, ws 0.8
 * Since devDependencies dosen't work on all platforms (npm 3.4.0) these packages are included to make the example.js work. They should be removed in production.
 * php-cgi or other must be installed on the system.
 
