@@ -98,7 +98,8 @@ Note that when calling PHP scripts through websockets, an additional concurrent 
     sphp.minSpareWorkers=4;
 
 #####maxWorkers (Default: 10)
-The maximum number of workers allowed to start. This number will never be exceeded. Request will be rejected.
+The maximum number of workers allowed to start. This number will never be exceeded. Requests will instead be rejected.
+
 Set this to limit the amount of RAM the server can use, when load is high. The footprint is about 20MB / worker as of php-cgi 5.4 php-gci
 
     sphp.maxWorkers=20;
