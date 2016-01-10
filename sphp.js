@@ -315,7 +315,9 @@ sphp.maintain=function(){
     // Start a child process (needs closure to avoid mix-up)
     (function(){
       // Start child process and Append worker to array
-      var proc=child_process.spawn(sphp.cgiEngine,[sphp.preBurnerScript]);
+      var proc=child_process.spawn(sphp.cgiEngine
+            ,[sphp.preBurnerScript]
+            ,{'cwd':sphp.docRoot});
       if(!proc.pid){
         console.error("Unable to start worker:" +sphp.cgiEngine);
         return;
