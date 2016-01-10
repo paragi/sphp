@@ -36,10 +36,6 @@
     "ws": "^0.8.1"
   },
   "peerDependencies":{
-    "express": "4.x",
-    "express-session": "1.x",
-    "body-parser": "1.x",
-    "ws": "0.x"
   },
   "directories": {
     "example": "example"

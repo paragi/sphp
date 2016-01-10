@@ -27,23 +27,27 @@ process.on('uncaughtException', function(err) {
   console.error("example.js requires modules installed. Use:"
     + "\n\n  npm install express express-session ws body-parser"
     + "\n\nError: ",err.message);
-})
+});
 
+// Load modules
 var express = require('express');
 var expressSession = require('express-session');
 var bodyParser = require('body-parser');
+var _ws = require('ws');
+
+process.removeAllListeners('uncaughtException');
+
+// Initialize server
 var sessionStore = new expressSession.MemoryStore();
 var sphp = require('./sphp.js');
 var app = express();
-var server = app.listen(8080,'0.0.0.0',function () {
+var server = app.listen(8080,'0.0.0.0','',function () {
   console.log('Server listening at://%s:%s'
     ,server.address().address
     ,server.address().port);
 });
-var ws = new require('ws').Server({server: server});
-
-process.on('uncaughtException','');
-
+var ws = new _ws.Server({server: server});
+var thisPath = module.filename.substring(0,module.filename.lastIndexOf("/"));
 
 // Set up session. store and name must be set, for sphp to catch it
 var sessionOptions={
@@ -72,7 +76,7 @@ app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodies
 
 // Attach sPHP
-app.use(sphp.express('example/'));
+app.use(sphp.express(thisPath+'/example/'));
 
 // Attach sPHP execution to the websocket connect event
 ws.on('connection',sphp.websocket(sessionOptions));
@@ -83,5 +87,5 @@ app.use(function(request, response, next){
     request._parsedUrl.pathname='/example.html';
   next();
 });
-app.use(express.static('example/'));
+app.use(express.static(thisPath+'/example/'));
 
