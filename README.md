@@ -4,7 +4,7 @@ A snappy PHP module / middleware.
 Features:
 * Middleware for node Express or stand alone php execution
 * Fast response time favored over use of resources
-* Websocket support: requests can be parsed a PHP scripts
+* Websocket support: requests can be parsed to a PHP scripts
 * Transfer of node session data to PHP's $_SESSION
 * No dependencies (except for example)
 * Mimic Apache mod_php population of $_SERVER

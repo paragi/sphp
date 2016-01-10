@@ -22,6 +22,13 @@
 (link? it)        
         
 \*============================================================================*/
+// Chatch missing modules
+process.on('uncaughtException', function(err) {
+  console.error("example.js requires modules installed. Use:"
+    + "\n\n  npm install express express-session ws body-parser"
+    + "\n\nError: ",err.message);
+})
+
 var express = require('express');
 var expressSession = require('express-session');
 var bodyParser = require('body-parser');
@@ -34,6 +41,9 @@ var server = app.listen(8080,'0.0.0.0',function () {
     ,server.address().port);
 });
 var ws = new require('ws').Server({server: server});
+
+process.on('uncaughtException','');
+
 
 // Set up session. store and name must be set, for sphp to catch it
 var sessionOptions={
