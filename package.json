@@ -1,6 +1,6 @@
 {
   "name": "sphp",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A snappy PHP execution module / middleware",
   "main": "sphp.js",
   "scripts": {
@@ -40,7 +40,7 @@
     "express-session": "1.x",
     "body-parser": "1.x",
     "ws": "0.x"
-  }
+  },
   "directories": {
     "example": "example"
   }
