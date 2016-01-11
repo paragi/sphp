@@ -19,7 +19,8 @@
     sphp.minSpareWorkers  defaults to 2
     sphp.maxWorkers       defaults to 10
     sphp.stepDowntime     defaults to 360
-
+    sphp.overwriteWSPath  null
+    
   Aspire to keep compability with scripts written for apache mod_php 
   Using node session controle and parsing it to PHP 
 
@@ -50,6 +51,7 @@ sphp.cgiEngine='php-cgi';
 sphp.minSpareWorkers=2;
 sphp.maxWorkers=10;
 sphp.stepDowntime=360;
+sphp.overwriteWSPath=null;
 
 // Initialize
 sphp.increaseTime=false;
@@ -150,18 +152,37 @@ sphp.exec=function(request,callback){
     if(exists){
       // See if there is a free worker
       for(var i=sphp.worker.length-1;i>=0;i--){
+        // Deploy worker
         if(sphp.worker[i].state=='ready') {
-          sphp._deploy(request,callback)(sphp.worker[i]);
+          // Set state
+          sphp.worker[i].state='running';
+          sphp.worker[i].time=(new Date).getTime();
+
+          //Transfer conInfo request informastion to stdin
+          sphp.worker[i].conInfo=sphp._getConInfo(request);
+          sphp.worker[i].stdin.write(JSON.stringify(sphp.worker[i].conInfo));
+
+          // Attach response handlers
+          sphp._responseHandler(sphp.worker[i],callback)
+
+          // Release input to worker (Let it run)
+          sphp.worker[i].stdin.end();
+          
+          if(process.stdout.isTTY) 
+            console.info("Deploying worker PID: ",sphp.worker[i].pid);
+          
           deployed=true;
           break;
         }
       }
+
       // Too busy 
       if(!deployed){
         callback('status',503
           , "Sorry, too busy right now. Please try again later");
         callback('end');
       }
+
     // File not found
     }else{  
       callback('status',404, "Sorry, unable to locate file: "
@@ -232,21 +253,14 @@ sphp.websocket = function (opt){
       opt.store.get(sid,function(error,data){
         if(data) request.session=data;
         // Execute php script
+      
+        
         sphp.exec(request,function output(event,data){
-            if(event=='data') socket.send(data,{"binary":false});
+          // Handle returned data
+          if(event=='data' && request.socket.upgradeReq.socket.writable) 
+            request.socket.send(data,{"binary":false});
         });
       },request);
-    });
-    
-    socket.on('close', function(request) {
-      //console.info('Websocket connection closed:');
-      // kill jobs
-    });
-    
-    socket.on('error', function(error) {
-    // ????
-      // kill jobs
-      //console.info('Websocket connection closed: %s');
     });
   }
 }
@@ -385,57 +399,29 @@ sphp.maintain=function(){
 }
 
 /*============================================================================*\
-  Deploy worker function
-
-  This function returns a function, that will deploy a worker to this request. 
-  Thus it can either be executed immediately or referred to job queue.
-  
-  The parameter to the returned function is the free worker
-  
-\*============================================================================*/
-sphp._deploy=function(request,callback){
-  return function(freeWorker){
-    // Set state
-    freeWorker.state='running';
-    freeWorker.time=(new Date).getTime();
-
-    //Transfer conInfo request informastion to stdin
-    freeWorker.conInfo=sphp._getConInfo(request);
-    freeWorker.stdin.write(JSON.stringify(freeWorker.conInfo));
-
-    // Attach response handlers
-    sphp._responseHandler(freeWorker,callback)
-
-    // Release input to worker (Let it run)
-    freeWorker.stdin.end();
-    
-    if(process.stdout.isTTY) 
-      console.info("Deploying worker PID: ",freeWorker.pid);
-  }  
-}
-
-/*============================================================================*\
   Compose a connection information record on client request
 \*============================================================================*/
 sphp._getConInfo=function(request){
   var conInfo = {};
 
   // Websocket request
-  if(typeof request.socket !== 'undefined'
-      && typeof request.socket.upgradeReq !== 'undefined'
-      && typeof request.socket.upgradeReq.headers !== 'undefined'){
+  if(typeof request.socket != 'undefined'
+      && typeof request.socket.upgradeReq != 'undefined'
+      && typeof request.socket.upgradeReq.headers != 'undefined'){
     conInfo.httpversion=request.socket.upgradeReq.httpVersion;
     conInfo.url=request._parsedUrl.href;
     conInfo.remoteport = request.socket._socket.remotePort;
     conInfo.header =request.socket.upgradeReq.headers;
-    conInfo.pathname = request._parsedUrl.pathname || '';
+    conInfo.pathname = sphp.overwriteWSPath || request._parsedUrl.pathname;
     conInfo.query = request._parsedUrl.query || '';
     conInfo.method='websocket';
     conInfo.body=JSON.parse(request.body) || '';
     conInfo.session=request.session;
 
   // Try basic HTTP request
-  }else if(typeof request.method !== 'undefined'){
+  }else if(typeof request.method != 'undefined'
+            && request.client
+            && request.client.remotePort){
     conInfo.httpversion=request.httpVersion || '';
     conInfo.url=request.url || '';
     conInfo.remoteaddress = request.client.remoteAddress || '';

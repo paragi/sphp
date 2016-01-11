@@ -109,6 +109,13 @@ The number of worker is increased dynamically, When the need arises. This is tim
 
     sphp.stepDowntime=600;
 
+#####overwriteWSPath (Default null)
+Used to specify which script should serve a websocket request.
+If null, the URL of the connection GET request is used.
+The path is relative to docRoot.
+
+    sphp.overwriteWSPath='/ws_serveice.php';
+
 
 ####Notes
 This project is about serving PHP scripts with the best response time possible. Favouring response timer over use of resources. This is achieved by pre-emptively spawning and loading of the PHP-CGI engine and holding it there, until needed.
@@ -119,7 +126,9 @@ Other requirement are:
 *Ability to transfer session data from node to php. 
 *Ability to access session data within a websocket request.
 
-
+####Bugfixes
+*0.3.6  Websocket Error 'not opened' when script don't exists
+*0.3.5  open_basedir restriction, without specifying doc roor in php.ini
 
 
 
