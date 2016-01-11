@@ -121,14 +121,14 @@ The path is relative to docRoot.
 This project is about serving PHP scripts with the best response time possible. Favouring response timer over use of resources. This is achieved by pre-emptively spawning and loading of the PHP-CGI engine and holding it there, until needed.
 
 Other requirement are:
-*Ability to Websockets served on the same port as the http.
-*Ability to use php scripts to serve websocket requests. (But not handling the connection itself)
+* Ability to Websockets served on the same port as the http.
+* Ability to use php scripts to serve websocket requests. (But not handling the connection itself)
 *Ability to transfer session data from node to php. 
 *Ability to access session data within a websocket request.
 
 ####Bugfixes
-*0.3.6  Websocket Error 'not opened' when script don't exists
-*0.3.5  open_basedir restriction, without specifying doc roor in php.ini
+* 0.3.6  Websocket Error 'not opened' when script don't exists
+* 0.3.5  open_basedir restriction, without specifying doc roor in php.ini
 
 
 
