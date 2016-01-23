@@ -26,6 +26,8 @@ $sw_name="PHP preburner 0.1.2";
 ini_set ("default_socket_timeout","-1" );
 // Disable PHP session 
 ini_set('session.use_cookies', '0');
+ini_set('session.name', 'SID');
+// session_name (
 
 /* ======================================================================== *\
     Get client request and server information

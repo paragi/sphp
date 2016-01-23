@@ -127,6 +127,7 @@ Other requirement are:
 *Ability to access session data within a websocket request.
 
 ####Bugfixes
+* 0.3.7  PHP session cookie disabled.
 * 0.3.6  Websocket Error 'not opened' when script don't exists
 * 0.3.5  open_basedir restriction, without specifying doc roor in php.ini
 
