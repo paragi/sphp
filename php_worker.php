@@ -24,6 +24,8 @@ $sw_name="PHP preburner 0.1.2";
 
 // Avoid that the input socket times out, before it is used
 ini_set ("default_socket_timeout","-1" );
+// Disable PHP session 
+ini_set('session.use_cookies', '0');
 
 /* ======================================================================== *\
     Get client request and server information

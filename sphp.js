@@ -254,7 +254,6 @@ sphp.websocket = function (opt){
         if(data) request.session=data;
         // Execute php script
       
-        
         sphp.exec(request,function output(event,data){
           // Handle returned data
           if(event=='data' && request.socket.upgradeReq.socket.writable) 

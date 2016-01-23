@@ -5,22 +5,21 @@
   Free to use, provided copyright note is preserved
   
   This example is showing how to make a:
-  * Snappy PHP response time
+  * Snappy PHP serverside scripting
   * Websocket support, utilising PHP script to serve requests
   * Transferring node sessions to PHP
 
   Sessions are created on a regular HTTP page request. The generated session are
   then used with the websocket request, identified by the same session ID cookie
 
-  Note: This example depends on the module express, ws express-session and 
+  Note: This example depends on the modules: express, ws express-session and 
         body-parser:
 
-          npm install express ws express-session body-parser
+        npm install express ws express-session body-parser
 
-        and the script php_worker.php in the root directory
 
-(link? it)        
-        
+  The script php_worker.php is always called, to set globals correctly etc.
+  The requested script are included by this script.
 \*============================================================================*/
 // Chatch missing modules
 process.on('uncaughtException', function(err) {

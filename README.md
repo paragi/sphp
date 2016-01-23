@@ -130,6 +130,12 @@ Other requirement are:
 * 0.3.6  Websocket Error 'not opened' when script don't exists
 * 0.3.5  open_basedir restriction, without specifying doc roor in php.ini
 
+####Help
+Please don't hesitate to submit an issue on github! It's the only way to make it better. But be please  prepared to present a test case.
+
+Contributions of almost any kind are welcome. 
+
+
 
 
 
