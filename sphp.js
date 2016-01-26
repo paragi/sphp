@@ -344,14 +344,23 @@ sphp.maintain=function(){
       // console.info("Starting worker PID: " + proc.pid);    
 
       // Attach end of process event
-      proc.on('exit', function (code) {
+      proc.on('exit', function (error) {
         // Form debug message
-        if(process.stdout.isTTY && proc.state=='ready'){
-          var str="Worker "+sphp.cgiEngine+" PID:"+proc.pid+" ended";
-          str+=" before it was deployed";
-          if(code) str+=" with code " + code;
-          console.info(str+" after "+((new Date).getTime()-proc.time)/1000+" Seconds");
-        }
+        if(error && process.stdout.isTTY && proc.state=='ready'){
+          var code=/\b[A-Z]+\b/g.exec(error);
+          var str="Worker script ended: " + sphp.preBurnerScript; 
+          str+="\n  PHP engine: "+sphp.cgiEngine;
+          str+="\n  Worker PID: "+proc.pid;
+          if(error)
+            if(sphp.errorDescription[code])
+              str+="\n  Ended with error (" + code + "): " 
+                 + sphp.errorDescription[code];
+            else  
+             str+="\n  Ended with error code: " + error;
+          console.error(str," after "+((new Date).getTime()-proc.time)/1000
+            +" Seconds");
+          throw new Error(str);    
+        }    
         // delete process record (Cant delete the 'this' object)
         proc.state="dead";
         //use splice to avoid holes in array
@@ -359,14 +368,20 @@ sphp.maintain=function(){
         sphp.maintain();
       });
       
-      proc.on('error', function (code) {
+      proc.on('error', function (error) {
         // Form debug message
         if(process.stdout.isTTY){
-          var str="Failed to start PHP engine:\n  "+sphp.cgiEngine;
-          str+=" (" + sphp.preBurnerScript + ")"; 
+          var code=/\b[A-Z]+\b/g.exec(error);
+          var str="Failed to start PHP engine: "+sphp.cgiEngine;
+          str+="\n  Preburner script: " + sphp.preBurnerScript; 
           str+="\n  Worker PID: "+proc.pid;
-          if(code) str+="\n  Ended with error code: " + code;
-          console.error(str,"\n  after "+((new Date).getTime()-proc.time)/1000
+          if(error)
+            if(sphp.errorDescription[code])
+              str+="\n  Ended with error (" + code + "): " 
+                 + sphp.errorDescription[code];
+            else  
+             str+="\n  Ended with error code: " + error;
+          console.error(str," after "+((new Date).getTime()-proc.time)/1000
             +" Seconds");
           throw new Error(str);    
         }        
@@ -566,3 +581,25 @@ sphp._responseHandler= function (proc,callback){
   });
 }
 
+
+/*============================================================================*\
+  Error descriptions  
+  
+  Elaborations on system error codes
+\*============================================================================*/
+
+sphp.errorDescription={
+   EACCES       : 'File access permission Permission denied'
+  ,EADDRINUSE   : 'Network port already in use with this IP address'
+  ,ECONNREFUSED : 'Connection refused by foreign host'
+  ,ECONNRESET   : 'Connection was forcibly closed by remote peer'
+  ,EEXIST       : 'File already exists'
+  ,EISDIR       : 'File name is a directory name'
+  ,EMFILE       : 'Maximum number of open files reached'
+  ,ENOENT       : 'File does not exist'
+  ,ENOTDIR      : 'Directory name is a file name'
+  ,ENOTEMPTY    : 'Directory not empty'
+  ,EPERM        : 'Elevated privileges required'
+  ,EPIPE        : 'Connection cloaed by remote' 
+  ,ETIMEDOUT    : 'Operation timed out'
+}

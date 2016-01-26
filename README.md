@@ -12,10 +12,10 @@ Features:
 * Comprehensive example of a server and a PHP websocket client
 
 Note:
+* **php-cgi** must be installed on the system. If its not in the PATH, cgiEngine must point an executable binary. 
 * File upload disabled at present.
 * Compatible with module: express 4.13, express-session 1.12, body-parser 1.14, ws 0.8
 * Since devDependencies dosen't work on all platforms (npm 3.4.0) these packages are included to make the example.js work. They should be removed in production.
-* php-cgi or other must be installed on the system.
 
 ####Install
 
@@ -105,9 +105,9 @@ Set this to limit the amount of RAM the server can use, when load is high. The f
     sphp.maxWorkers=20;
 
 #####stepDowntime (Default: 360 seconds)
-The number of worker is increased dynamically, When the need arises. This is time it takes before the number of workers, are reduced by one.
+The number of worker are increased dynamically, When the need arises. This is the time it takes before, the number of workers, are reduced by one.
 
-    sphp.stepDowntime=600;
+    sphp.stepDowntime=1800;
 
 #####overwriteWSPath (Default null)
 Used to specify which script should serve a websocket request.
@@ -120,19 +120,22 @@ The path is relative to docRoot.
 ####Notes
 This project is about serving PHP scripts with the best response time possible. Favouring response timer over use of resources. This is achieved by pre-emptively spawning and loading of the PHP-CGI engine and holding it there, until needed.
 
-Other requirement are:
-* Ability to Websockets served on the same port as the http.
-* Ability to use php scripts to serve websocket requests. (But not handling the connection itself)
-*Ability to transfer session data from node to php. 
-*Ability to access session data within a websocket request.
+Other requirement are the ability to:
+* use Websockets, served on the same port as the http server.
+* use php scripts to serve websocket requests. (But not handling the connection itself)
+* transfer session data from node drddion to php $_SESSION
+* access session data within a websocket request.
 
 ####Bugfixes
+* 0.3.8  php_worker.php Typo
 * 0.3.7  PHP session cookie disabled.
 * 0.3.6  Websocket Error 'not opened' when script don't exists
 * 0.3.5  open_basedir restriction, without specifying doc roor in php.ini
 
 ####Help
-Please don't hesitate to submit an issue on github! It's the only way to make it better. But be please  prepared to present a test case.
+Please don't hesitate to submit an issue on github! It's the only way to make it better. 
+
+But please be prepared to present a test case.
 
 Contributions of almost any kind are welcome. 
 
