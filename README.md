@@ -10,7 +10,7 @@ Features:
 * Mimic Apache mod_php population of $_SERVER
 * Highly configurable.
 * Comprehensive example of a server and a PHP websocket client
-* **NEW: pre load** php librarys scripts premtively.
+* **NEW:** load php librarys scripts premtively.
 
 Note:
 * **php-cgi** must be installed on the system. If its not in the PATH, cgiEngine must point an executable binary. 
