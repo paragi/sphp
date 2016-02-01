@@ -429,7 +429,12 @@ sphp._getConInfo=function(request){
     conInfo.pathname = sphp.overwriteWSPath || request._parsedUrl.pathname;
     conInfo.query = request._parsedUrl.query || '';
     conInfo.method='websocket';
-    conInfo.body=JSON.parse(request.body) || '';
+    if(typeof request.body !== 'object') 
+      try{ 
+        conInfo.body=JSON.parse(request.body);
+      }catch(e){}
+    else      
+      conInfo.body=request.body || '';
     conInfo.session=request.session;
 
   // Try basic HTTP request

@@ -13,7 +13,7 @@ Features:
 * **NEW:** load php library scripts premtively.
 
 Note:
-* **php-cgi** must be installed on the system. If its not in the PATH, cgiEngine must point an executable binary. 
+* **php-cgi** must be installed on the system. If its not in the PATH, cgiEngine must point to an executable binary. 
 * File upload disabled at present.
 * Compatible with module: express 4.13, express-session 1.12, body-parser 1.14, ws 0.8
 * Since devDependencies dosen't work on all platforms (npm 3.4.0) these packages are included to make the example.js work. They should be removed in production.
@@ -120,10 +120,9 @@ The path is relative to docRoot.
 #####preLoadScript (Default null)
 This can be used to preload libraries, before a page is requested, thus improving reaponcetime.
 The preLoadScript variable contains a path to a php script, relative to docRoot.
-Be aware that the script pointet to will be executed when the php engine is loaded eg. before a client has made a page request. non of the super globals are set to usefull values at this point.
+Be aware that the script pointet to will be executed when the php engine is loaded eg. before a client has made a page request. non of the super globals are set to usefull values at this point. The script sould contain generic library function that are use system wide, as it will be loaded with all page.
 
     sphp.overwriteWSPath='library.php';
-
 
 ####Notes
 This project is about serving PHP scripts with the best response time possible. Favouring response timer over use of resources. This is achieved by pre-emptively spawning and loading of the PHP-CGI engine and holding it there, until needed.
@@ -135,6 +134,10 @@ Other requirement are the ability to:
 * access session data within a websocket request.
 
 ####Bugfixes
+* 0.3.12 Documentation update
+* 0.3.11 Documentation update
+* 0.3.10 Preloading php library scripts, to improve responsetime
+* 0.3.9  Documentation update
 * 0.3.8  php_worker.php Typo
 * 0.3.7  PHP session cookie disabled.
 * 0.3.6  Websocket Error 'not opened' when script don't exists
