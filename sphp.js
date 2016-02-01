@@ -330,7 +330,7 @@ sphp.maintain=function(){
       // Start child process and Append worker to array
       var proc=child_process.spawn(sphp.cgiEngine
             ,[sphp.preBurnerScript]
-            ,{'cwd':sphp.docRoot});
+            ,{'cwd':sphp.docRoot,'env':{'preload':sphp.docRoot +'/'+ sphp.preLoadScript}});
       if(!proc.pid){
         console.error("Unable to start worker:" +sphp.cgiEngine);
         return;

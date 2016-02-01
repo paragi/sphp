@@ -10,6 +10,7 @@ Features:
 * Mimic Apache mod_php population of $_SERVER
 * Highly configurable.
 * Comprehensive example of a server and a PHP websocket client
+* **NEW: pre load** php librarys scripts premtively.
 
 Note:
 * **php-cgi** must be installed on the system. If its not in the PATH, cgiEngine must point an executable binary. 
@@ -115,6 +116,13 @@ If null, the URL of the connection GET request is used.
 The path is relative to docRoot.
 
     sphp.overwriteWSPath='/ws_serveice.php';
+
+#####preLoadScript (Default null)
+This can be used to preload libraries, before a page is requested, thus improving reaponcetime.
+The preLoadScript variable contains a path to a php script, relative to docRoot.
+Be aware that the script pointet to will be executed when the php engine is loaded eg. before a client has made a page request. non of the super globals are set to usefull values at this point.
+
+    sphp.overwriteWSPath='library.php';
 
 
 ####Notes

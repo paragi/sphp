@@ -27,7 +27,9 @@ ini_set ("default_socket_timeout","-1" );
 // Disable PHP session 
 ini_set('session.use_cookies', '0');
 ini_set('session.name', 'SID');
-// session_name (
+
+// include pre load script
+@include(getenv('preload'));
 
 /* ======================================================================== *\
     Get client request and server information
@@ -40,7 +42,7 @@ $request=json_decode(file_get_contents("php://stdin"),true);
     Populate predefined global variables
 \* ======================================================================== */
 // _SERVER
-$path=$_SERVER['PATH'];
+$path=(isset($_SERVER['PATH'])?$_SERVER['PATH']:'/');
 // Clear arrays
 unset($_SERVER);
 $argc=0;
