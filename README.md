@@ -134,6 +134,7 @@ Other requirement are the ability to:
 * access session data within a websocket request.
 
 ####Bugfixes
+* 0.3.13 Websocket body can now be either a string or an object
 * 0.3.12 Documentation update
 * 0.3.11 Documentation update
 * 0.3.10 Preloading php library scripts, to improve responsetime
