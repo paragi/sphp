@@ -21,7 +21,7 @@
   The script php_worker.php is always called, to set globals correctly etc.
   The requested script are included by this script.
 \*============================================================================*/
-// Chatch missing modules
+// Catch missing modules
 process.on('uncaughtException', function(err) {
   console.error("example.js requires modules installed. Use:"
     + "\n\n  npm install express express-session ws body-parser"
