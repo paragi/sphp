@@ -1,13 +1,16 @@
 <?php
 /*----------------------------------------------------------------------------*\
-  Websocket client
+ Websocket client 
   
-  (c) Paragi Aps 2013, Simon Riget
-  Free to use, provided that the copyright text are preserved.
+ By Paragi 2013, Simon Riget MIT license.
   
-  Open a websocket connection for sending and reveiving binary data.
-    
-  The hybi10 frame decoding: 
+ This is a demonstration of a websocket clinet. Please add propper errorhandling 
+ and such, if you use it for anythin else.
+ 
+ If you find flaws in it, please tell me.
+ 
+ 
+ Websockets use hybi10 frame encoding: 
 
     0                   1                   2                   3
         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -31,15 +34,10 @@
   See: https://tools.ietf.org/rfc/rfc6455.txt
   or:  http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-10#section-4.2
 
-
-  Notes:
-    - Continuous frames and ping pong is not yet well tested
-    - This code throws errors. If you dont have handling, you should use try/catch
-
-// Stack opdater
-// http://stackoverflow.com/questions/7160899/websocket-client-in-php
-// http://stackoverflow.com/questions/22370966/connecting-to-websocket-with-php-client
-
+  Notes about limits in this code:
+    Using binary transfer mode
+    Maximum of 32 bit lenght of data
+    Application length are limited to 1GB to support small 32 bit system
   
 \*----------------------------------------------------------------------------*/
 
