@@ -134,6 +134,11 @@ Other requirement are the ability to:
 * access session data within a websocket request.
 
 ####Bugfixes
+* 0.3.14 Added server session ID to session
+         conInfo.session.sid = request.sessionID;
+         php_worker uses session.sid from server session rather than cookie  
+         node version 7 compatible
+         Try harder to make sense og request record
 * 0.3.13 Websocket body can now be either a string or an object
 * 0.3.12 Documentation update
 * 0.3.11 Documentation update
