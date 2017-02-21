@@ -1,8 +1,0 @@
-Added server session ID to session
-  conInfo.session.sid = request.sessionID;
-  php_worker uses session.sid from server session rather than cookie  
-  node version 7 compatible
-  Try harder to make sense og request record
-  
-  
-  
