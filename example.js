@@ -1,76 +1,91 @@
+/*============================================================================*\
+  Example of webserver using PHP and websockets served on the same port (80)
+  
+  (c) Paragi Aps, Simon Riget 2015.
+  Free to use, provided copyright note is preserved
+  
+  This example is showing how to make a:
+  * Snappy PHP serverside scripting
+  * Websocket support, utilising PHP script to serve requests
+  * Transferring node sessions to PHP
 
-var server = require('http').createServer()
-  , url = require('url')
-  , WebSocketServer = require('ws').Server
-  , wss = new WebSocketServer({ server: server })
-  , express = require('express')
-  , app = express()
-  , port = 8080;
- 
-app.use(express.static('example/'));
+  Sessions are created on a regular HTTP page request. The generated session are
+  then used with the websocket request, identified by the same session ID cookie
 
-wss.on('connection', function connection(ws) {
-  var location = url.parse(ws.upgradeReq.url, true);
-  // you might use location.query.access_token to authenticate or share sessions
-  // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
-console.log('Connected');
-  ws.on('message', function incoming(message) {
-    ws.send('Got it');
-    console.log('received: %s', message);
-  });
+  Note: This example depends on the modules: express, ws express-session and 
+        body-parser:
 
-  ws.send('something');
+        npm install express ws express-session body-parser
+
+
+  The script php_worker.php is always called, to set globals correctly etc.
+  The requested script are included by this script.
+\*============================================================================*/
+// Catch missing modules
+process.on('uncaughtException', function(err) {
+  console.error("example.js requires modules installed. Use:"
+    + "\n\n  npm install express express-session ws body-parser"
+    + "\n\nError: ",err.message);
 });
 
-server.on('request', app);
-server.listen(8080, function () { console.log('Listening on ' + server.address().port) });
-
-
-/*============================================================================*\
-  Load modules
-\*============================================================================*
+// Load modules
 var express = require('express');
 var expressSession = require('express-session');
+var bodyParser = require('body-parser');
+var _ws = require('ws');
+
+process.removeAllListeners('uncaughtException');
+
+// Initialize server
+var sessionStore = new expressSession.MemoryStore();
 var sphp = require('./sphp.js');
 var app = express();
-var server = require('http').createServer(app);
-var ws = new require('ws').Server({server: server});
+var server = app.listen(8080,'0.0.0.0','',function () {
+  console.log('Server listening at://%s:%s'
+    ,server.address().address
+    ,server.address().port);
+});
+var ws = new _ws.Server({server: server});
+var thisPath = module.filename.substring(0,module.filename.lastIndexOf("/"));
 
+// Set up session. store and name must be set, for sphp to catch it
+var sessionOptions={
+   store: sessionStore
+  ,secret:'yes :c)'
+  ,resave:false
+  ,saveUninitialized:false
+  ,rolling: true
+  ,name: 'SID'
+}
 
-// Middleware
-//app.use(expressSession({secret:'yes :c)',resave:false,saveUninitialized:false}));
-//app.use(sphp.express('example/'));
-app.use(express.static('example/'));
+sphp.overwriteWSPath="/ws_request.php";
+/*============================================================================*\
+  Middleware
+\*============================================================================*/
+// Attach session control
+app.use(expressSession(sessionOptions));
 
-
-// Start server
-app.listen(8080,'0.0.0.0');
-
-// Attach "receive message" event handler opon websocket connection
-wss.on('connection', function(socket) {
-  console.info("Client connected");
-
-  // Handler for incomming messages
-  socket.on('message', function(request) {
-    console.info("Received ws message: ",request);
-    var responce="Reply";
-    socket.send(JSON.stringify(responce),{"binary":false},function(){});
-  });
-  
-  socket.on('close', function(request) {
-    console.info('Websocket connection closed: %s');
-  });
-
+// Save some session specific data
+app.use(function(request, response, next){ 
+  request.session.ip=request.client.remoteAddress;
+  next();
 });
 
-wss.on('close', function(socket) {
-  console.info("WS Connection closed");
-});
-wss.on('error', function(socket) {
-  console.info("WS Connection error");
-});
+// Parsing POST requests (Not for websockets)
+app.use(bodyParser.json());       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodies
 
-*/
-console.info('running');
+// Attach sPHP
+app.use(sphp.express(thisPath+'/example/'));
 
+// Attach sPHP execution to the websocket connect event
+ws.on('connection',sphp.websocket(sessionOptions));
+
+// Setup html file server
+app.use(function(request, response, next){ 
+  if(request._parsedUrl.pathname == '/') 
+    request._parsedUrl.pathname='/example.html';
+  next();
+});
+app.use(express.static(thisPath+'/example/'));
 
