@@ -26,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/paragi/sphp/issues"
   },
-  "homepage": "https://github.com/paragi/sphp#readme"
+  "homepage": "https://github.com/paragi/sphp#readme",
+  "dependencies": {
+    "ws": "^0.8.1"
+  }
 }
