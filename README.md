@@ -1,4 +1,4 @@
-##Snappy PHP for node js
+## Snappy PHP for node js
 A snappy PHP module / middleware. 
 
 Features:
@@ -18,11 +18,11 @@ Note:
 * Compatible with module: express 4.13, express-session 1.12, body-parser 1.14, ws 0.8
 * Since devDependencies dosen't work on all platforms (npm 3.4.0) these packages are included to make the example.js work. They should be removed in production.
 
-####Install
+#### Install
 
     npm install sphp
 
-####Use with express
+#### Use with express
 
     var express = require('express');
     var sphp = require('sphp');
@@ -33,7 +33,7 @@ Note:
     app.use(sphp.express('public/'));
     app.use(express.static('public/'));
 
-####Use with ws (Websockets)
+#### Use with ws (Websockets)
 
     var express = require('express');
     var sphp = require('sphp');
@@ -46,7 +46,7 @@ Note:
     ws.on('connection',sphp.websocket());
     app.use(express.static('public/'));
     
-####Use with express-session
+#### Use with express-session
 
     var express = require('express');
     var expressSession = require('express-session');
@@ -78,53 +78,53 @@ Note:
     ws.on('connection',sphp.websocket(sessionOptions));
     app.use(express.static('example/'));
 
-####Configuration
+#### Configuration
 sPHP module variables are exposed, for easy configuration:
 
-#####cgiEngine (Default: php-cgi)
+##### cgiEngine (Default: php-cgi)
 Specify which binary file to use to execute PHP script. The executable must be in the environment PATH or use a full path to the executable file.
 
     sphp.cgiEngine='php';
 
-#####docRoot (default: ./public)
+##### docRoot (default: ./public)
 Where to serve script files from. Might be relative or an absolute path. This is the variable set, when sphp.express is called with a parameter.
 
     sphp.docRoot='./my_files';
 
-#####minSpareWorkers (Default: 2)
+##### minSpareWorkers (Default: 2)
 Define the minimum number of workers kept ready. 
 Note that when calling PHP scripts through websockets, an additional concurrent worker is used. 
 
 
     sphp.minSpareWorkers=4;
 
-#####maxWorkers (Default: 10)
+##### maxWorkers (Default: 10)
 The maximum number of workers allowed to start. This number will never be exceeded. Requests will instead be rejected.
 
 Set this to limit the amount of RAM the server can use, when load is high. The footprint is about 20MB / worker as of php-cgi 5.4 php-gci
 
     sphp.maxWorkers=20;
 
-#####stepDowntime (Default: 360 seconds)
+##### stepDowntime (Default: 360 seconds)
 The number of worker are increased dynamically, When the need arises. This is the time it takes before, the number of workers, are reduced by one.
 
     sphp.stepDowntime=1800;
 
-#####overwriteWSPath (Default null)
+##### overwriteWSPath (Default null)
 Used to specify which script should serve a websocket request.
 If null, the URL of the connection GET request is used.
 The path is relative to docRoot.
 
     sphp.overwriteWSPath='/ws_serveice.php';
 
-#####preLoadScript (Default null)
+##### preLoadScript (Default null)
 This can be used to preload libraries, before a page is requested, thus improving reaponcetime.
 The preLoadScript variable contains a path to a php script, relative to docRoot.
 Be aware that the script pointet to will be executed when the php engine is loaded eg. before a client has made a page request. non of the super globals are set to usefull values at this point. The script sould contain generic library function that are use system wide, as it will be loaded with all page.
 
     sphp.overwriteWSPath='library.php';
 
-####Notes
+#### Notes
 This project is about serving PHP scripts with the best response time possible. Favouring response timer over use of resources. This is achieved by pre-emptively spawning and loading of the PHP-CGI engine and holding it there, until needed.
 
 Other requirement are the ability to:
@@ -133,7 +133,7 @@ Other requirement are the ability to:
 * transfer session data from node drddion to php $_SESSION
 * access session data within a websocket request.
 
-####Bugfixes
+#### Bugfixes
 * 0.3.15 Output to stderr is now returned last, and loged to server erro output.
 * 0.3.14 Added server session ID to session
          conInfo.session.sid = request.sessionID;
@@ -150,7 +150,7 @@ Other requirement are the ability to:
 * 0.3.6  Websocket Error 'not opened' when script don't exists
 * 0.3.5  open_basedir restriction, without specifying doc roor in php.ini
 
-####Help
+#### Help
 Please don't hesitate to submit an issue on github.
 
 But please be prepared to present a test case.
