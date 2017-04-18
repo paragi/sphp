@@ -87,12 +87,7 @@ sphp.express=function(docRoot){
 
   // Initiliaze once 
   if(sphp.docRoot) sphp.docRoot=docRoot;
-/*  
-  if(!sphp.worker){
-    sphp.worker=[]; 
-    sphp.maintain();
-  }
-  */
+
   // Return middleware function
   return function(request, response, next){
     // Check file extention
@@ -122,8 +117,8 @@ sphp.express=function(docRoot){
         response.end();
         break;
       case 'error':
-        console.error('PHP script launche error: %s',data);
-        response.end();
+        console.error(data);
+        response.write(data,'binary');
         break;
       default:
         console.error("'PHP script unknown event: '%s'",event);
@@ -601,10 +596,12 @@ sphp._responseHandler= function (proc,callback){
           for(var i in headers) callback('header',i,headers[i]);
           headersSent=true;
 
+/*
           // Send error messages, if any was send before end of headers
           if(errorBuffer.length>0){
-            callback('data',errorBuffer);
+            callback('error',errorBuffer);
           }
+*/          
           // Send body part if any
           if(buffer.length>eoh+4){
             callback('data',buffer.substr(eoh+4));
@@ -621,11 +618,11 @@ sphp._responseHandler= function (proc,callback){
   // Error. Catch standard error output from script
   proc.stderr.on('data', function (data) {
     if(end) return;
-    // Fix: Store error messages until headers are sent
+
     if(!headersSent){
       if(errorBuffer.length<4096) errorBuffer+=data.toString();
     }else{
-      callback('data',data.toString());
+      callback('error',data.toString());
     }
   });
 
@@ -636,7 +633,7 @@ sphp._responseHandler= function (proc,callback){
       for(var i in headers) callback('header',i,headers[i]);
       headersSent=true;
     }
-    if(errorBuffer.length>0) callback('data',errorBuffer);
+    if(errorBuffer.length>0) callback('error',errorBuffer);
     end=true;
     callback('end');
   });

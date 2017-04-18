@@ -1,12 +1,12 @@
 {
   "name": "sphp",
-  "version": "0.3.14",
+  "version": "0.3.15",
   "description": "A snappy PHP execution module / middleware",
   "main": "sphp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "tonicExampleFilename": "browser.js",
+  "runkitExampleFilename": "browser.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/paragi/sphp.git"
@@ -29,10 +29,10 @@
   },
   "homepage": "https://github.com/paragi/sphp#readme",
   "devDependencies": {
-    "express": "^4.13.3",
-    "express-session": "^1.12.1",
-    "body-parser": "^1.14.2",
-    "ws": "^0.8.1"
+    "express": "^4",
+    "express-session": "^1",
+    "body-parser": "^1",
+    "ws": "^0.8"
   },
   "peerDependencies":{
   },

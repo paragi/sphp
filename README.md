@@ -5,12 +5,12 @@ Features:
 * Middleware for node Express or stand alone php execution
 * Fast response time favored over use of resources
 * Websocket support: requests can be parsed to a PHP scripts
-* Transfer of node session data to PHP's $_SESSION
+* Transfer of node session dat and cookie to PHP ( in $_SERVER['SESION'] )
 * No dependencies (except for example)
 * Mimic Apache mod_php population of $_SERVER
 * Highly configurable.
 * Comprehensive example of a server and a PHP websocket client
-* **NEW:** load php library scripts premtively.
+* load php library scripts premtively.
 
 Note:
 * **php-cgi** must be installed on the system. If its not in the PATH, cgiEngine must point to an executable binary. 
@@ -134,6 +134,7 @@ Other requirement are the ability to:
 * access session data within a websocket request.
 
 ####Bugfixes
+* 0.3.15 Output to stderr is now returned last, and loged to server erro output.
 * 0.3.14 Added server session ID to session
          conInfo.session.sid = request.sessionID;
          php_worker uses session.sid from server session rather than cookie  
@@ -150,7 +151,7 @@ Other requirement are the ability to:
 * 0.3.5  open_basedir restriction, without specifying doc roor in php.ini
 
 ####Help
-Please don't hesitate to submit an issue on github! It's the only way to make it better. 
+Please don't hesitate to submit an issue on github.
 
 But please be prepared to present a test case.
 
