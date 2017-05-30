@@ -61,12 +61,9 @@ $_SERVER['REMOTE_HOST']=@$request['header']['host'];
 $_SERVER['REMOTE_PORT']=@$request['remoteport'];
 
 // Split address and port
-if(@$_SERVER['HTTP_REFERER']){
+if(!empty($_SERVER['HTTP_REFERER'])){
   $url=parse_url($_SERVER['HTTP_REFERER']);
-  if(@$url['port']) 
-    $_SERVER['SERVER_PORT'] = ($url['port']);
-  else
-    $_SERVER['SERVER_PORT'] = 80;
+  $_SERVER['SERVER_PORT'] = !empty($url['port']) ? $url['port'] : 80;
   $_SERVER['SERVER_ADDR'] =$url['host'];
 }
 // Add script name and paths

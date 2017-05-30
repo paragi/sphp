@@ -1,6 +1,6 @@
 {
   "name": "sphp",
-  "version": "0.3.15",
+  "version": "0.4.00",
   "description": "A snappy PHP execution module / middleware",
   "main": "sphp.js",
   "scripts": {
@@ -34,9 +34,14 @@
     "body-parser": "^1",
     "ws": "^0.8"
   },
-  "peerDependencies":{
-  },
+  "peerDependencies": {},
   "directories": {
     "example": "example"
+  },
+  "dependencies": {
+    "body-parser": "^1",
+    "express": "^4",
+    "express-session": "^1",
+    "ws": "^0"
   }
 }

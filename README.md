@@ -1,28 +1,46 @@
 ## Snappy PHP for node js
-A snappy PHP module / middleware. 
+A snappy PHP module / middleware.
+
+Fast response time is favored over use of resources and performance under load. Therefore this package is best suited embedded system and small application with few user.
 
 Features:
-* Middleware for node Express or stand alone php execution
-* Fast response time favored over use of resources
-* Websocket support: requests can be parsed to a PHP scripts
-* Transfer of node session dat and cookie to PHP ( in $_SERVER['SESION'] )
+* Use PHP in node with express and websockets. 
+* Transfer node express session to php and reuse session ID and cookie
 * No dependencies (except for example)
 * Mimic Apache mod_php population of $_SERVER
 * Highly configurable.
-* Comprehensive example of a server and a PHP websocket client
-* load php library scripts premtively.
+* Comes with example of a server and a PHP websocket client
 
-Note:
-* **php-cgi** must be installed on the system. If its not in the PATH, cgiEngine must point to an executable binary. 
-* File upload disabled at present.
-* Compatible with module: express 4.13, express-session 1.12, body-parser 1.14, ws 0.8
-* Since devDependencies dosen't work on all platforms (npm 3.4.0) these packages are included to make the example.js work. They should be removed in production.
+**Note:** php-cgi must be installed on the system. If its not in the PATH, the variable cgiEngine must be set to point to an executable binary.
+
+File upload is disabled at present.
 
 #### Install
 
     npm install sphp
+    
+#### Run example server
 
-#### Use with express
+Make sure php-cgi is installed (not just php)
+
+  npm install -g express express-session ws body-parser
+
+Change directory to to where sphp reside (node_module):
+
+  cd sphp
+
+Run the example server
+
+  node example.js
+
+Connect to the exampleserver in a browser:
+
+  http://localhost:8080  or  http://<address of server>:8080       
+
+You should now se the example pages.
+    
+
+### Set up with an express server
 
     var express = require('express');
     var sphp = require('sphp');
@@ -33,7 +51,8 @@ Note:
     app.use(sphp.express('public/'));
     app.use(express.static('public/'));
 
-#### Use with ws (Websockets)
+
+### Set up with an express server and websockets
 
     var express = require('express');
     var sphp = require('sphp');
@@ -45,8 +64,9 @@ Note:
     app.use(sphp.express('public/'));
     ws.on('connection',sphp.websocket());
     app.use(express.static('public/'));
+
     
-#### Use with express-session
+#### Set up with an express server and express-session
 
     var express = require('express');
     var expressSession = require('express-session');
@@ -78,7 +98,8 @@ Note:
     ws.on('connection',sphp.websocket(sessionOptions));
     app.use(express.static('example/'));
 
-#### Configuration
+
+### Configuration
 sPHP module variables are exposed, for easy configuration:
 
 ##### cgiEngine (Default: php-cgi)
@@ -124,16 +145,19 @@ Be aware that the script pointet to will be executed when the php engine is load
 
     sphp.overwriteWSPath='library.php';
 
-#### Notes
-This project is about serving PHP scripts with the best response time possible. Favouring response timer over use of resources. This is achieved by pre-emptively spawning and loading of the PHP-CGI engine and holding it there, until needed.
+### Notes
+The aim of this project is to serve PHP scripts with the best response time possible. Another important functionality is integration with websocket and access to the express servers session data.
 
-Other requirement are the ability to:
-* use Websockets, served on the same port as the http server.
-* use php scripts to serve websocket requests. (But not handling the connection itself)
-* transfer session data from node drddion to php $_SESSION
-* access session data within a websocket request.
+The responsetime is achieved by sacrificing considerations of resources and performance under load. This is implemented  by pre-emptively loading of the PHP-CGI engine and a user PHP script, typically including generic PHP library. The process is then put on hold until needed.
 
-#### Bugfixes
+### Bugfixes
+* 0.4.0 Updated to run with express v4 and ws v3
+        PHP output on standart-error are now send when closing.
+        stderr now gets loged to console.error. 
+        Changed 'binary' transfer mode to 'UTF-8' to acommodate browser changes
+        Fixed race condition when termination with error.
+        Fixed websocket error, when not having a session id.
+        Fixed PHP_worker.php warning.
 * 0.3.15 Output to stderr is now returned last, and loged to server erro output.
 * 0.3.14 Added server session ID to session
          conInfo.session.sid = request.sessionID;
@@ -150,13 +174,10 @@ Other requirement are the ability to:
 * 0.3.6  Websocket Error 'not opened' when script don't exists
 * 0.3.5  open_basedir restriction, without specifying doc roor in php.ini
 
-#### Help
-Please don't hesitate to submit an issue on github.
+### Help
+Please don't hesitate to submit an issue on github. But please be prepared to present a test case.
 
-But please be prepared to present a test case.
-
-Contributions of almost any kind are welcome. 
-
+Contributions are welcome. Code should look good and be covered by a test case or example.
 
 
 

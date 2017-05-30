@@ -1,5 +1,8 @@
 PHP output on standart error are now send when closing, and loged to console.error. 
-
+Errors during preload, now reported
+maintain function added error message proccessing
+Termination with error, race condition fixed
+PHP_worker warning fixed.
 -----
 Added server session ID to session
   conInfo.session.sid = request.sessionID;

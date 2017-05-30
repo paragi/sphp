@@ -24,13 +24,13 @@
   Aspire to keep compability with scripts written for apache mod_php 
   Using node session controle and parsing it to PHP 
 
-  
   notes:
     - Websockets has a differant request structure from a static page requests  
 
     
   To do:
     make php-fpm interface
+    file upload
     check 404 on php
     
 \*============================================================================*/
@@ -97,28 +97,25 @@ sphp.express=function(docRoot){
     }
 
     // Launch script
-    var headerSent=false;
     sphp.exec(request,function(event,data,param){
-      // handle callbacks 
+      // console.debug("----Recieving ",event," With: ",data,":",param);    
       if(!response.finished) switch (event){
       case 'status':
-        if(headerSent) break;
         response.status(data);
         break;
       case 'header':
-        if(headerSent || response.headersSent) break;
+        if(response.headersSent) break;
         response.setHeader(data,param);
         break;
       case 'data':
-        headerSent=true;
-        response.write(data,'binary');
+        response.write(data,'utf-8');
         break;
       case 'end':
         response.end();
         break;
       case 'error':
         console.error(data);
-        response.write(data,'binary');
+        response.write(data,'utf-8');
         break;
       default:
         console.error("'PHP script unknown event: '%s'",event);
@@ -155,19 +152,20 @@ sphp.exec=function(request,callback){
       // See if there is a free worker
       for(var i=sphp.worker.length-1;i>=0;i--){
         // Deploy worker
-        if(sphp.worker[i].state=='ready') {
+        if(sphp.worker[i].proc.state=='ready') {
           // Set state
-          sphp.worker[i].state='running';
-          sphp.worker[i].time=(new Date).getTime();
+          sphp.worker[i].proc.state='running';
+          sphp.worker[i].proc.time=(new Date).getTime();
+          sphp.worker[i].proc.callback = callback;
 
           //Transfer conInfo request informastion to stdin
-          sphp.worker[i].conInfo=sphp._getConInfo(request);
-          sphp.worker[i].stdin.write(JSON.stringify(sphp.worker[i].conInfo));
+          sphp.worker[i].proc.conInfo = sphp._getConInfo(request);
 
           // Attach response handlers
           sphp._responseHandler(sphp.worker[i],callback)
 
           // Release input to worker (Let it run)
+          sphp.worker[i].stdin.write(JSON.stringify(sphp.worker[i].proc.conInfo));
           sphp.worker[i].stdin.end();
           
           if(process.stdout.isTTY) 
@@ -197,36 +195,6 @@ sphp.exec=function(request,callback){
 }
 
 /*============================================================================*\
-  Execute PHP script directly
-  
-  This has to work during initialization.
-\*============================================================================*/
-sphp.execDirect=function(path,callback){
-
-  var proc=child_process.spawn(sphp.cgiEngine
-                              ,[sphp.preBurnerScript]
-                              ,{'cwd':sphp.docRoot});
-        
-  if(!proc.pid){
-    console.error("Unable to start worker:" +sphp.cgiEngine);
-    return false;
-  }
-
-  // Attach response handlers
-  if(typeof callback === 'function')
-    sphp._responseHandler(proc,callback);
-
-  // Write path to sidin, for Release input to worker (Let it run)
-  proc.stdin.write('{"pathname":"'+path+'"'
-                  +',"method":"direct","docroot":"'+ sphp.docRoot + '"}');
-  proc.stdin.end();
-      
-  if(process.stdout.isTTY) 
-    console.info("Initializing script PID: ",proc.pid);
-}
-
-
-/*============================================================================*\
   Websocket: Attach on connection event
 
   Attach a "receive message" event handler 
@@ -254,45 +222,59 @@ sphp.execDirect=function(path,callback){
       
 \*============================================================================*/
 sphp.websocket = function (opt){
-  return function(socket) {
+  return function(socket,IncomingMessage) {
     //console.info("Client connected");
 
+    if(typeof socket.upgradeReq == 'undefined') // WS 3.0 fix
+      socket.upgradeReq = IncomingMessage;
+      
     // Handler for incomming messages
     socket.on('message', function(msg){
       var sid;
       var parts;
-     
+      //console.info("Received ws message: ",request.body);
+
       // Create a pseudo request record 
       var request={
          socket: socket
         ,body:   msg.toString()
       };
-      //console.info("Received ws message: ",request.body);
 
       // Parse POST body as JSON to PHP  
-      socket.upgradeReq.headers['Content-Type']="application/json";
-       //console.log("WS Headers: ",socket.upgradeReq.headers);
+      //socket.upgradeReq.headers['Content-Type']="application/json";
+      
+      //console.log("WS Headers: ",socket.upgradeReq.headers);
+      
       // Find session cookie content, by name
       parts=unescape(socket.upgradeReq.headers.cookie).match(
         '(^|;)\\s*' + opt.name + '\\s*=\\s*([^;]+)');
-//logger.debug("ws session psrts: ",parts);        
+      //logger.debug("ws session parts: ",parts);        
       if(parts){
-        sid=parts[0].split(/[=.]/)[1];
+        request.sessionID=parts[0].split(/[=.]/)[1];
         // SID is serialised. Use value between s: and . as index (SID)
-        if(sid.substr(0,2) == 's:') sid=sid.substr(2);
-      }
-      
-      // Find session. Use value between s: and . as index (SID)
-      opt.store.get(sid,function(error,data){
-        if(data) request.session=data;
-        // Execute php script
-      
-        sphp.exec(request,function output(event,data){
-          // Handle returned data
-          if(event=='data' && request.socket.upgradeReq.socket.writable) 
-            request.socket.send(data,{"binary":true});
-        });
-      },request);
+        if(request.sessionID.substr(0,2) == 's:')
+          request.sessionID=request.sessionID.substr(2);
+        
+        // Find session. Use value between s: and . as index (SID)
+        opt.store.get(request.sessionID,function(error,data){
+          if(data) request.session=data;
+          // Execute php script
+        
+          sphp.exec(request,function(event,data){
+            // Handle returned data
+            if(event=='data' && request.socket.upgradeReq.socket.writable) 
+              request.socket.send(data);
+              //console.log("Sending:",event,data);            
+          });
+        },request);
+
+      // Execute PHP without session
+      }else sphp.exec(request,function(event,data){
+        // Handle returned data
+        if(event=='data' && request.socket.upgradeReq.socket.writable) 
+          request.socket.send(data);
+          //console.log("Sending:",event,data);            
+      });      
     });
   }
 }
@@ -335,14 +317,16 @@ Worker array objects layout:
 sphp.maintain=function(){
 
   var spares=0,workers=0;
-  var proc;
   var job;
 
   // Count free workers
   for(var i in sphp.worker){
     // Find free workers
-    if(sphp.worker[i].state=='ready') spares++
-    workers++;
+    if(sphp.worker[i].proc.state=='ready') spares++
+    if(sphp.worker[i].proc.state=='dead') 
+      sphp.worker.splice(i,1);
+    else  
+      workers++;
   }
 
   // increase number of workers
@@ -358,76 +342,66 @@ sphp.maintain=function(){
 
   // Start spare workers
   for(; spares < sphp.cminSpareWorkers && workers<sphp.maxWorkers; spares++){
-    // Start a child process (needs closure to avoid mix-up)
-    (function(){
-      // Start child process and Append worker to array
-      var proc=child_process.spawn(sphp.cgiEngine
-            ,[sphp.preBurnerScript]
-            ,{'cwd':sphp.docRoot,'env':{'preload':sphp.docRoot +'/'+ sphp.preLoadScript}});
-      if(!proc.pid){
-        console.error("Unable to start worker:" +sphp.cgiEngine);
-        return;
-      }
-      // Some process settings
-      proc.state='ready';    
-      proc.time=(new Date).getTime();
-      proc.stderr.setEncoding('utf8');  
-      proc.stdout.setEncoding('binary');
-      sphp.worker.unshift(proc);  
-      // console.info("Starting worker PID: " + proc.pid);    
+    // Start child process and Append worker to array
+    sphp.worker.unshift(
+      child_process.spawn(sphp.cgiEngine
+        ,[sphp.preBurnerScript]
+        ,{ cwd: sphp.docRoot
+          ,env: {'preload':sphp.docRoot +'/'+ sphp.preLoadScript}
+        }
+      )
+    );
+    if(!sphp.worker[0].pid){
+      console.error("Unable to start worker:" +sphp.cgiEngine);
+      return;
+    }
 
-      // Attach end of process event
-      proc.on('exit', function (error) {
-        // Form debug message
-        if(error && process.stdout.isTTY && proc.state=='ready'){
-          var code=/\b[A-Z]+\b/g.exec(error);
-          var str="Worker script ended: " + sphp.preBurnerScript; 
-          str+="\n  PHP engine: "+sphp.cgiEngine;
-          str+="\n  Worker PID: "+proc.pid;
-          if(error)
-            if(sphp.errorDescription[code])
-              str+="\n  Ended with error (" + code + "): " 
-                 + sphp.errorDescription[code];
-            else  
-             str+="\n  Ended with error code: " + error;
-          console.error(str," after "+((new Date).getTime()-proc.time)/1000
-            +" Seconds");
-          throw new Error(str);    
-        }    
-        // delete process record (Cant delete the 'this' object)
-        proc.state="dead";
-        //use splice to avoid holes in array
-        sphp.worker.splice(sphp.worker.indexOf(this),1);
-        sphp.maintain();
-      });
-      
-      proc.on('error', function (error) {
-        // Form debug message
-        if(process.stdout.isTTY){
-          var code=/\b[A-Z]+\b/g.exec(error);
-          var str="Failed to start PHP engine: "+sphp.cgiEngine;
-          str+="\n  Preburner script: " + sphp.preBurnerScript; 
-          str+="\n  Worker PID: "+proc.pid;
-          if(error)
-            if(sphp.errorDescription[code])
-              str+="\n  Ended with error (" + code + "): " 
-                 + sphp.errorDescription[code];
-            else  
-             str+="\n  Ended with error code: " + error;
-          console.error(str," after "+((new Date).getTime()-proc.time)/1000
-            +" Seconds");
-          throw new Error(str);    
-        }        
-        // delete process record (Cant delete the 'this' object)
-        proc.state="dead";
-        //use splice to avoid holes in array
-        sphp.worker.splice(sphp.worker.indexOf(this),1);
-        sphp.maintain();
-      });
-    })();
+    // Some process settings
+    sphp.worker[0].stderr.setEncoding('utf-8');  
+    sphp.worker[0].stdout.setEncoding('utf-8');
+    sphp.worker[0].stdout.parent = sphp.worker[0];
+    sphp.worker[0].stderr.parent = sphp.worker[0];
+    sphp.worker[0].proc = {
+       state: 'ready'
+      ,time: (new Date).getTime()
+      ,outBuffer: ''
+      ,errorBuffer: ''
+    }
+    // console.info("Starting worker PID: " + proc.pid);    
+
+    // Make temporary listners for output (Errors) 
+    sphp.worker[0].stdout.on('data', function(data) {
+      if(sphp.worker[0].proc.outBuffer.length<4096) 
+        sphp.worker[0].proc.outBuffer += data.toString();
+    });
+
+    sphp.worker[0].stderr.on('data', function(data) {
+      if(this.parent.proc.errorBuffer.length<4096) 
+        this.parent.proc.errorBuffer += data.toString();
+    });
+
+    // Attach end of process event
+    sphp.worker[0].on('exit', function (error) {
+      if(error && this.proc.state=='ready'){
+        FormDebugMessage(this,'exit',error);
+        this.proc.state="dead";
+      }  
+      if(this.proc.state!='dead')  
+        process.nextTick(sphp.maintain);  
+    });
+
+    sphp.worker[0].on('error', function (error) {
+      if(error && this.proc.state=='ready'){
+        FormDebugMessage(this,'error',error);
+        this.proc.state="dead";
+      }  
+      if(this.proc.state!='dead')  
+        process.nextTick(sphp.maintain);  
+    });
+
     workers++;
   }
-
+  
   // repport on workers
   if(process.stdout.isTTY){
     console.info("==========================================================================");
@@ -436,13 +410,31 @@ sphp.maintain=function(){
     workers=0; spares=0;         
     for(var i in sphp.worker){
       workers++;
-      console.info(i,"PID:",sphp.worker[i].pid," State:",sphp.worker[i].state
-        ," age:",+((new Date).getTime()-sphp.worker[i].time)/1000+" Seconds");
+      console.info(i,"PID:",sphp.worker[i].pid," State:",sphp.worker[i].proc.state
+        ," age:",+((new Date).getTime()-sphp.worker[i].proc.time)/1000+" Seconds");
       // Find free workers
       if(sphp.worker[i].state=='ready') spares++
     }
     console.info("==========================================================================");
   }
+  
+  function FormDebugMessage(worker, event, error){
+//console.debug("FormDebugMessage this",this);  
+    var str = "PHP worker script ended with error."
+    str += "\n  PHP engine: "+sphp.cgiEngine;
+    str += "\n  Preburner script: " + sphp.preBurnerScript; 
+    //str += "\n  Worker PID: "+worker.pid;
+    str+="\n  Error code: " + error;
+    if(worker.proc.errorBuffer.length || worker.proc.outBuffer.length){
+      str += "\n  Script error message: " 
+      str += "\n" + worker.proc.outBuffer 
+      str += "\n" + worker.proc.errorBuffer;
+    }
+//    str += " after "+((new Date).getTime()-worker.proc.time)/1000;
+//    str += " Seconds";
+    throw new Error(str);    
+  }
+
 }
 
 /*============================================================================*\
@@ -469,8 +461,6 @@ sphp._getConInfo=function(request){
       }catch(e){}
     else      
       conInfo.body=request.body || '';
-    conInfo.session=request.session;
-    conInfo.session.sid = request.sessionID;
 
   // Try basic HTTP request
   }else if(typeof request.method != 'undefined'
@@ -485,9 +475,6 @@ sphp._getConInfo=function(request){
     conInfo.query = request.query || ''
     conInfo.method=request.method || ''; 
     conInfo.body=request.body || '';
-    conInfo.session = request.session;
-    if(conInfo.session)
-      conInfo.session.sid = request.sessionID;
     conInfo.files={};
     for(var f in request.files){
       conInfo.files[f]={};
@@ -505,15 +492,17 @@ sphp._getConInfo=function(request){
       }catch(e){}
     else      
       conInfo.body=request.body || '';
-    if(request.session){  
-      conInfo.session=request.session;
-      conInfo.session.sid = request.sessionID || '';
-    }  
     conInfo.query = request.query || ''
     conInfo.method=request.method || ''; 
     conInfo.pathname = request._parsedUrl.pathname || '';
   }
-  
+
+  // Get Session info  
+  if(request.session){  
+    conInfo.session=request.session;
+    conInfo.session.sid = request.sessionID || '';
+  }  
+
   // Add document root
   conInfo.docroot=path.resolve(sphp.docRoot);
 
@@ -553,110 +542,103 @@ sphp._getConInfo=function(request){
     for strange 404 see http://woozle.org/~neale/papers/php-cgi.html
  
 \*============================================================================*/
-sphp._responseHandler= function (proc,callback){
-  var buffer='';
-  var errorBuffer='';
-  var headersSent=false;
-  var end=false; 
-  var headers={'Content-type':'text/html'}; // Fix 1
+sphp._responseHandler= function (worker,callback){
+  worker.proc.outBuffer='';
+  worker.proc.errorBuffer='';
+  worker.proc.headersSent = false;
+  worker.proc.headers=''; 
+
+  // Remove listners for workers in idle state
+  worker.stdout.removeAllListeners('data');
+  worker.stderr.removeAllListeners('data');
+  worker.removeAllListeners('error');
+  worker.removeAllListeners('exit');
+ 
   // Catch output from script and send it to client
-  proc.stdout.on('data', function (data) {
-    if(end) return;
-
-    if(!headersSent){
+  worker.stdout.on('data', function(data){
+    var worker = this.parent;
+    if(worker.proc.state != 'running') return;
+    if(!worker.proc.headersSent){
       // Store headers until a end of header is received (\r\n\r\n)
-      buffer+=data;
-      // Pre-process headers
-      if(data.toString().indexOf('\r\n\r\n')){
-        // Locate end of header section, Separate headers from body parts and 
-        // divide headers into lines  
-        var eoh=buffer.indexOf('\r\n\r\n');
-        if(eoh>=0){
-          var line=buffer.substr(0,eoh+2).split('\n');
-          var div =-1;
-          for(var i in line){
-            // Split header into key, value pairs
-            div = line[i].indexOf(":");
-            if(div>0){
-              // Handle redirect location header
-              if(line[i].substr(0,div).toLowerCase()=='location'){
-                callback('status',302);
-                callback('header','Location',line[i].substr(div+2));
-                end=true;
-                callback('end');
-                return;
-              }
-
-              // remove \r and duplicate headers so that last one counts
-              headers[ line[i].substr(0,div) ] = line[i].substr(div+2).replace(/\r/g,'');
+      worker.proc.headers += data.toString();
+      
+      // Pre-process headers: divide headers into lines and separate body data
+      var eoh = worker.proc.headers.indexOf('\r\n\r\n');
+      if(eoh >= 0){
+        var line = worker.proc.headers.substr(0,eoh+2).split('\n');
+        var header = [];
+        var div;
+        for(var i in line){
+          // Split header into key, value pairs
+          div = line[i].indexOf(":");
+          if(div>0){
+            // Handle redirect location header
+            if(line[i].substr(0,div).toLowerCase()=='location'){
+              callback('status',302);
+              callback('header','Location',line[i].substr(div+2));
+              worker.proc.state = 'dieing';
+              callback('end');
+              return;
             }
+            // remove \r and duplicate headers so that last one counts
+            header[ line[i].substr(0,div) ] = line[i].substr(div+2).replace(/\r/g,'');
           }
+        }
 
-          // Send headers
-          for(var i in headers) callback('header',i,headers[i]);
-          headersSent=true;
-
-/*
-          // Send error messages, if any was send before end of headers
-          if(errorBuffer.length>0){
-            callback('error',errorBuffer);
-          }
-*/          
-          // Send body part if any
-          if(buffer.length>eoh+4){
-            callback('data',buffer.substr(eoh+4));
-          }
-        }        
+        // Send headers
+        for(var i in header) callback('header',i,header[i]);
+        worker.proc.headersSent = true;
+        
+        // Send body part if any
+        if(worker.proc.headers.length>eoh+4){
+          callback('data',worker.proc.headers.substr(eoh+4));
+        }
       }
     
     // Body
     }else{;
-      callback('data',data);
+      callback('data',data.toString());
     }
   });
 
-  // Error. Catch standard error output from script
-  proc.stderr.on('data', function (data) {
-    if(end) return;
+  // Error. Catch standard error output from script (but don't send it until the end)
+  worker.stderr.on('data', (function(worker,callback){
+    return function (data) {
+      if(worker.proc.errorBuffer.length<4096) 
+        worker.proc.errorBuffer += data.toString();
+    };
+  })(worker,callback));
 
-    if(!headersSent){
-      if(errorBuffer.length<4096) errorBuffer+=data.toString();
-    }else{
-      callback('error',data.toString());
-    }
-  });
+  worker.stdout.on('close', (function(worker,callback){
+    return function () { endWithGrace(worker,callback); }; 
+  })(worker,callback));
+ 
+  worker.stderr.on('close', (function(worker,callback){
+    return function () { endWithGrace(worker,callback); }; 
+  })(worker,callback));
 
-  proc.stdout.on('close', function () {
-    if(end) return;
-
-    if(!headersSent){
-      for(var i in headers) callback('header',i,headers[i]);
-      headersSent=true;
-    }
-    if(errorBuffer.length>0) callback('error',errorBuffer);
-    end=true;
-    callback('end');
-  });
-}
-
-/*============================================================================*\
-  Error descriptions  
+  worker.on('exit', (function(worker,callback){
+    return function () { endWithGrace(worker,callback); }; 
+  })(worker,callback));
   
-  Elaborations on system error codes
-\*============================================================================*/
-
-sphp.errorDescription={
-   EACCES       : 'File access permission Permission denied'
-  ,EADDRINUSE   : 'Network port already in use with this IP address'
-  ,ECONNREFUSED : 'Connection refused by foreign host'
-  ,ECONNRESET   : 'Connection was forcibly closed by remote peer'
-  ,EEXIST       : 'File already exists'
-  ,EISDIR       : 'File name is a directory name'
-  ,EMFILE       : 'Maximum number of open files reached'
-  ,ENOENT       : 'File does not exist'
-  ,ENOTDIR      : 'Directory name is a file name'
-  ,ENOTEMPTY    : 'Directory not empty'
-  ,EPERM        : 'Elevated privileges required'
-  ,EPIPE        : 'Connection cloaed by remote' 
-  ,ETIMEDOUT    : 'Operation timed out'
+  worker.on('error', (function(worker,callback){
+    return function () { endWithGrace(worker,callback); }; 
+  })(worker,callback));
+  
+  function endWithGrace(worker,callback){
+    //console.debug("Closeing event this:",worker);
+    if(worker.proc.state == 'running'){
+      worker.proc.state = 'dead';
+      if(!worker.proc.headersSent){
+        callback('header','Content-type','text/html'); // Fix 1
+        var eoh = worker.proc.headers.indexOf('\r\n\r\n');
+        if(eoh >= 0 && worker.proc.headers.length > eoh+4)
+          callback('data',worker.proc.headers.substr(eoh+4));
+      }
+      if(worker.proc.outBuffer.length) callback('data',worker.proc.outBuffer);
+      if(worker.proc.errorBuffer.length) callback('error',worker.proc.errorBuffer);
+      callback('end');
+      process.nextTick(sphp.maintain);
+    }
+  }
 }
