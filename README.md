@@ -1,13 +1,13 @@
 ## Snappy PHP for node js
 A snappy PHP module / middleware.
 
-Fast response time is favored over use of resources and performance under load. Therefore this package is best suited embedded system and small application with few user.
+Fast response time is favored over use of resources and performance under load. This package is best suited embedded system and small application with few user, where you just need a fast response time for a few users.
 
 Features:
-* Use PHP in node with express and websockets. 
+* Use PHP in node with express, sessions and websockets. 
 * Transfer node express session to php and reuse session ID and cookie
 * No dependencies (except for example)
-* Mimic Apache mod_php population of $_SERVER
+* Mimic Apache mod_php population of the PH super global $_SERVER
 * Highly configurable.
 * Comes with example of a server and a PHP websocket client
 
@@ -23,11 +23,11 @@ File upload is disabled at present.
 
 Make sure php-cgi is installed (not just php)
 
-  npm install -g express express-session ws body-parser
+    npm install -g express express-session ws body-parser
 
-Change directory to to where sphp reside (node_module):
+Change directory to to where sphp reside (node_module/...):
 
-  cd sphp
+    cd sphp
 
 Run the example server
 
@@ -35,7 +35,7 @@ Run the example server
 
 Connect to the exampleserver in a browser:
 
-  http://localhost:8080  or  http://<address of server>:8080       
+    http://localhost:8080  or  http://<address of server>:8080       
 
 You should now se the example pages.
     
@@ -177,7 +177,7 @@ The responsetime is achieved by sacrificing considerations of resources and perf
 ### Help
 Please don't hesitate to submit an issue on github. But please be prepared to present a test case.
 
-Contributions are welcome. Code should look good and be covered by a test case or example.
+Contributions are welcome. Code should look good and compact, and be covered by a test case or example.
 
 
 
