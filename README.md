@@ -151,7 +151,12 @@ The aim of this project is to serve PHP scripts with the best response time poss
 The responsetime is achieved by sacrificing considerations of resources and performance under load. This is implemented  by pre-emptively loading of the PHP-CGI engine and a user PHP script, typically including generic PHP library. The process is then put on hold until needed.
 
 ### Bugfixes
+<<<<<<< HEAD
+* 0.4.3 Updated denendencies
 * 0.4.0 Updated to run with express v4
+=======
+* 0.4.0 Updated to run with express v4 
+>>>>>>> 09885e43197f1364ada1c85d8deaaea85cfd4f7d
         PHP output on standart-error are now send when closing.
         stderr now gets loged to console.error. 
         Changed 'binary' transfer mode to 'UTF-8' to acommodate browser changes
