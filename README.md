@@ -175,11 +175,12 @@ The responsetime is achieved by sacrificing considerations of resources and perf
 * 0.3.5  open_basedir restriction, without specifying doc roor in php.ini
 
 ### Help
-Please don't hesitate to submit an issue on github. But please be prepared to present a test case.
+I appriciate contributions. Code should look good and compact, and be covered by a test case or example.
 
-Contributions are welcome. Code should look good and compact, and be covered by a test case or example.
+in any case don't hesitate to submit an issue on github, with a test case.
 
 
 
+license
 
 

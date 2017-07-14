@@ -1,3 +1,5 @@
+session.sid is no longer set
+----
 PHP output on standart error are now send when closing, and loged to console.error. 
 Errors during preload, now reported
 maintain function added error message proccessing

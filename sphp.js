@@ -500,7 +500,7 @@ sphp._getConInfo=function(request){
   // Get Session info  
   if(request.session){  
     conInfo.session=request.session;
-    conInfo.session.sid = request.sessionID || '';
+//    conInfo.session.sid = request.sessionID || '';
   }  
 
   // Add document root
