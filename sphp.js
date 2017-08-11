@@ -105,7 +105,7 @@ sphp.express=function(docRoot){
         break;
       case 'header':
         if(response.headersSent) break;
-        response.setHeader(data,param);
+        response.setHeader(data,param).replace(/(?:\r\n|\r|\n)/g, '').replace(/undefined/g);
         break;
       case 'data':
         response.write(data,'utf-8');
