@@ -1,4 +1,19 @@
+Todo:
+
+Check: preload output gemmes
+doc: Beskriv brug af express session read only...
+prog: parameter til kø eler discard når max worker er nået.
+fejl: WP og cookies
+
+----
+
+
+Added serverName parameter. If set it is used in the $_SERVER['SERVER_NAME'] super  global. Typically this is set to the hostname og the webserver.
+Fixed Cr/Nl in headers (compattible to express 4)
+fixed too few spare workers started, when minSpareWorkers > default value
+448 request.socket == 'object'
 session.sid is no longer set
+
 ----
 PHP output on standart error are now send when closing, and loged to console.error. 
 Errors during preload, now reported

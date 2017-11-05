@@ -1,6 +1,6 @@
 {
   "name": "sphp",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "A snappy PHP execution module / middleware",
   "main": "sphp.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "fast",
     "php"
   ],
-  "author": "Paragi Aps, Simon Rigét <simon.riget@gmail.com>",
+  "author": "Paragi Aps, Simon Rigét <simon.riget@gmail.com> 2014",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/paragi/sphp/issues"

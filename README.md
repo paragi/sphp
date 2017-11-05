@@ -1,7 +1,7 @@
 ## Snappy PHP for node js
 A snappy PHP module / middleware.
 
-Fast response time is favored over use of resources and performance under load. This package is best suited embedded system and small application with few user, where you just need a fast response time for a few users.
+Fast response time is favored over use of resources and performance under load. This package is best suited embedded system and small application with few user, where you just need a fast response time without much load.
 
 Features:
 * Use PHP in node with express, sessions and websockets. 
@@ -145,18 +145,36 @@ Be aware that the script pointet to will be executed when the php engine is load
 
     sphp.overwriteWSPath='library.php';
 
+##### superglobals 
+This can be used to preset PHP superglobals like $_SERVER['SERVER_NAME'] 
+Any variable can be set, but will be overwriten, if the mane is one of thouse that is set during request time.
+
+To set the server name:
+    sphp.superglobals._SERVER.SERVER_NAME = 'MyServer.com';
+
+To load the enviroment variables:
+    sphp.superglobals._ENV = JSON.parse(JSON.stringify(process.env));
+
+The following variables are predefined and will be futher populated at request time:
+    _POST
+    _GET
+    _FILES
+    _SERVER: SERVER_SOFTWARE, SERVER_NAME
+    _COOKIE
+
 ### Notes
 The aim of this project is to serve PHP scripts with the best response time possible. Another important functionality is integration with websocket and access to the express servers session data.
 
 The responsetime is achieved by sacrificing considerations of resources and performance under load. This is implemented  by pre-emptively loading of the PHP-CGI engine and a user PHP script, typically including generic PHP library. The process is then put on hold until needed.
 
 ### Bugfixes
-<<<<<<< HEAD
+* 0.5.0 Added superglobals preset options
+        Fixed Cr/Nl in headers (compattible to express 4)
+        fixed too few spare workers started, when minSpareWorkers > default value
+session.sid is no longer set
 * 0.4.3 Updated denendencies
 * 0.4.0 Updated to run with express v4
-=======
 * 0.4.0 Updated to run with express v4 
->>>>>>> 09885e43197f1364ada1c85d8deaaea85cfd4f7d
         PHP output on standart-error are now send when closing.
         stderr now gets loged to console.error. 
         Changed 'binary' transfer mode to 'UTF-8' to acommodate browser changes

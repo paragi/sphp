@@ -16,8 +16,8 @@
 
   configure by setting the following variablws:
     sphp.cgiEngine        defaults to 'php-cgi'
-    sphp.minSpareWorkers  defaults to 2
-    sphp.maxWorkers       defaults to 10
+    sphp.minSpareWorkers  defaults to 10
+    sphp.maxWorkers       defaults to 20
     sphp.stepDowntime     defaults to 360
     sphp.overwriteWSPath  null
     
@@ -38,23 +38,39 @@ var fs = require('fs');
 var path = require("path");
 var child_process = require("child_process");
 var url=require('url');
+var os = require('os');
+
 // Define php object
 var sphp ={};
 module.exports = exports = sphp;
 
 // Set defaults
 sphp.docRoot='./public';
+sphp.superglobals = {
+   _POST: {}
+  ,_GET: {}
+  ,_FILES: {}
+  ,_SERVER: {
+     GATEWAY_INTERFACE: "PHP preburner 0.1.3"
+    ,SERVER_SOFTWARE: "PHP Appilation Server using Node.js and WS Websockets"
+  }
+  ,_COOKIE: {}
+//  ,_ENV: JSON.parse(JSON.stringify(process.env))
+};
 
+/*                                
+  [SERVER_NAME] => 
+
+*/
 sphp.cgiEngine='php-cgi';
-sphp.minSpareWorkers=2;
-sphp.maxWorkers=10;
+sphp.minSpareWorkers=10;
+sphp.maxWorkers=20;
 sphp.stepDowntime=360;
 sphp.overwriteWSPath=null;
 
 // Initialize
 sphp.increaseTime=false;
 sphp.maintenance=false;
-sphp.cminSpareWorkers=sphp.minSpareWorkers;
 
 // Find absolute path to this directory and add script name
 sphp.preBurnerScript=module.filename.substring(0,module.filename.lastIndexOf("/"));
@@ -106,6 +122,11 @@ sphp.express=function(docRoot){
       case 'header':
         if(response.headersSent) break;
         response.setHeader(data,param);
+        // Handle redirect header
+        if(data.toLowerCase() == 'location'){
+          response.writeHead(302, { 'Content-Type': 'text/plain' });
+          response.end('ok');
+        }
         break;
       case 'data':
         response.write(data,'utf-8');
@@ -168,7 +189,7 @@ sphp.exec=function(request,callback){
           sphp.worker[i].stdin.write(JSON.stringify(sphp.worker[i].proc.conInfo));
           sphp.worker[i].stdin.end();
           
-          if(process.stdout.isTTY) 
+          if(process.stdout.isTTY && false) 
             console.info("Deploying worker PID: ",sphp.worker[i].pid);
           
           deployed=true;
@@ -319,6 +340,9 @@ sphp.maintain=function(){
   var spares=0,workers=0;
   var job;
 
+  if(typeof sphp.cminSpareWorkers === 'undefined')
+    sphp.cminSpareWorkers=sphp.minSpareWorkers;
+
   // Count free workers
   for(var i in sphp.worker){
     // Find free workers
@@ -329,6 +353,9 @@ sphp.maintain=function(){
       workers++;
   }
 
+  if(sphp.cminSpareWorkers < sphp.minSpareWorkers) 
+    sphp.cminSpareWorkers = sphp.minSpareWorkers;
+    
   // increase number of workers
   if(spares<1 && workers<sphp.maxWorkers){
     if(sphp.increaseTime) sphp.cminSpareWorkers++;
@@ -403,7 +430,7 @@ sphp.maintain=function(){
   }
   
   // repport on workers
-  if(process.stdout.isTTY){
+  if(process.stdout.isTTY && false){
     console.info("==========================================================================");
     console.info("PHP Workers spares:",spares," min:",sphp.cminSpareWorkers," Max:",sphp.maxWorkers);
 
@@ -435,78 +462,6 @@ sphp.maintain=function(){
     throw new Error(str);    
   }
 
-}
-
-/*============================================================================*\
-  Compose a connection information record on client request
-\*============================================================================*/
-sphp._getConInfo=function(request){
-  var conInfo = {};
-
-  // Websocket request
-  if(typeof request.socket != 'undefined'
-      && typeof request.socket.upgradeReq != 'undefined'
-      && typeof request.socket.upgradeReq.headers != 'undefined'){
-    conInfo.httpversion=request.socket.upgradeReq.httpVersion;
-    conInfo.url=request._parsedUrl.href;
-    if(request.socket._socket)
-      conInfo.remoteport = request.socket._socket.remotePort;
-    conInfo.header =request.socket.upgradeReq.headers;
-    conInfo.pathname = sphp.overwriteWSPath || request._parsedUrl.pathname;
-    conInfo.query = request._parsedUrl.query || '';
-    conInfo.method='websocket';
-    if(typeof request.body !== 'object') 
-      try{ 
-        conInfo.body=JSON.parse(request.body);
-      }catch(e){}
-    else      
-      conInfo.body=request.body || '';
-
-  // Try basic HTTP request
-  }else if(typeof request.method != 'undefined'
-            && request.client
-            && request.client.remotePort){
-    conInfo.httpversion=request.httpVersion || '';
-    conInfo.url=request.url || '';
-    conInfo.remoteaddress = request.client.remoteAddress || '';
-    conInfo.remoteport = request.client.remotePort || '';
-    conInfo.header = request.headers || '';
-    conInfo.pathname = request._parsedUrl.pathname || '';
-    conInfo.query = request.query || ''
-    conInfo.method=request.method || ''; 
-    conInfo.body=request.body || '';
-    conInfo.files={};
-    for(var f in request.files){
-      conInfo.files[f]={};
-      conInfo.files[f].name=request.files[f].name;
-      conInfo.files[f].size=request.files[f].size;
-      conInfo.files[f].tmp_name=request.files[f].path;
-      conInfo.files[f].type=request.files[f].type;
-    }
-
-  // Initialize script or unrecognised. Try something...
-  }else{
-    if(request.body && typeof request.body !== 'object') 
-      try{ 
-        conInfo.body=JSON.parse(request.body);
-      }catch(e){}
-    else      
-      conInfo.body=request.body || '';
-    conInfo.query = request.query || ''
-    conInfo.method=request.method || ''; 
-    conInfo.pathname = request._parsedUrl.pathname || '';
-  }
-
-  // Get Session info  
-  if(request.session){  
-    conInfo.session=request.session;
-//    conInfo.session.sid = request.sessionID || '';
-  }  
-
-  // Add document root
-  conInfo.docroot=path.resolve(sphp.docRoot);
-
-  return conInfo;
 }
 
 /*============================================================================*\
@@ -557,6 +512,7 @@ sphp._responseHandler= function (worker,callback){
   // Catch output from script and send it to client
   worker.stdout.on('data', function(data){
     var worker = this.parent;
+    var redirect = false;
     if(worker.proc.state != 'running') return;
     if(!worker.proc.headersSent){
       // Store headers until a end of header is received (\r\n\r\n)
@@ -564,34 +520,31 @@ sphp._responseHandler= function (worker,callback){
       
       // Pre-process headers: divide headers into lines and separate body data
       var eoh = worker.proc.headers.indexOf('\r\n\r\n');
+      var eohLen = 4;
+      if(eoh <= 0){
+        eoh = worker.proc.headers.indexOf('\n\n');
+        eohLen = 2;
+      }
+      
       if(eoh >= 0){
-        var line = worker.proc.headers.substr(0,eoh+2).split('\n');
-        var header = [];
+        var line = worker.proc.headers.substr(0,eoh).split('\n');
         var div;
         for(var i in line){
-          // Split header into key, value pairs
+          // Split header line into key, value pair
           div = line[i].indexOf(":");
           if(div>0){
-            // Handle redirect location header
-            if(line[i].substr(0,div).toLowerCase()=='location'){
-              callback('status',302);
-              callback('header','Location',line[i].substr(div+2));
-              worker.proc.state = 'dieing';
-              callback('end');
-              return;
-            }
-            // remove \r and duplicate headers so that last one counts
-            header[ line[i].substr(0,div) ] = line[i].substr(div+2).replace(/\r/g,'');
+            var key = line[i].substr(0,div);
+            var value = line[i].substr(div+2).replace("\r","");
+// console.log("Sending header 1:",key,":",value);            
+            callback('header',key,value);
           }
         }
-
-        // Send headers
-        for(var i in header) callback('header',i,header[i]);
         worker.proc.headersSent = true;
-        
+
+        // Handle redirect location header
         // Send body part if any
-        if(worker.proc.headers.length>eoh+4){
-          callback('data',worker.proc.headers.substr(eoh+4));
+        if(worker.proc.headers.length>eoh+eohLen){
+          callback('data',worker.proc.headers.substr(eoh+eohLen));
         }
       }
     
@@ -637,8 +590,131 @@ sphp._responseHandler= function (worker,callback){
       }
       if(worker.proc.outBuffer.length) callback('data',worker.proc.outBuffer);
       if(worker.proc.errorBuffer.length) callback('error',worker.proc.errorBuffer);
+//console.log("--------------------------------------------------------------");      
       callback('end');
       process.nextTick(sphp.maintain);
     }
   }
+}
+
+/*============================================================================*\
+  Compose a connection information record on client request
+  
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                            href                                             │
+├──────────┬──┬─────────────────────┬─────────────────────┬───────────────────────────┬───────┤
+│ protocol │  │        auth         │        host         │           path            │ hash  │
+│          │  │                     ├──────────────┬──────┼──────────┬────────────────┤       │
+│          │  │                     │   hostname   │ port │ pathname │     search     │       │
+│          │  │                     │              │      │          ├─┬──────────────┤       │
+│          │  │                     │              │      │          │ │    query     │       │
+"  https:   //    user   :   pass   @ sub.host.com : 8080   /p/a/t/h  ?  query=string   #hash "
+│          │  │          │          │   hostname   │ port │          │                │       │
+│          │  │          │          ├──────────────┴──────┤          │                │       │
+│ protocol │  │ username │ password │        host         │          │                │       │
+├──────────┴──┼──────────┴──────────┼─────────────────────┤          │                │       │
+│   origin    │                     │       origin        │ pathname │     search     │ hash  │
+├─────────────┴─────────────────────┴─────────────────────┴──────────┴────────────────┴───────┤
+│                                             URI                                             │
+├─────────────────────────────────────────────────────────────────────────────────────┬───────┤
+│                                                         │          URL              │       │
+└─────────────────────────────────────────────────────────┴───────────────────────────┴───────┘
+
+\*============================================================================*/
+sphp._getConInfo=function(request){
+  // Copy predefined super globals
+  var conInfo = JSON.parse(JSON.stringify(sphp.superglobals)); 
+
+  /*==========================================================================*\
+    Websocket request
+  \*==========================================================================*/
+  if(typeof request.socket  == 'object'
+      && typeof request.socket.upgradeReq != 'undefined'
+      && typeof request.socket.upgradeReq.headers != 'undefined'){
+  
+    var extReq = request.socket.upgradeReq;
+    conInfo._SERVER.REMOTE_PORT = request.socket._socket.remotePort || '';
+    conInfo._SERVER.REMOTE_ADDR = request.socket._socket.remoteAddress || '';
+    conInfo._SERVER.REQUEST_METHOD = 'websocket';
+    conInfo._GET = url.parse(request._parsedUrl.href, true).query;
+ 
+   /*==========================================================================*\
+    basic HTTP request
+  \*==========================================================================*/
+  }else{
+
+    var extReq = request;
+    conInfo._SERVER.REMOTE_ADDR = request.client.remoteAddress || '';
+    conInfo._SERVER.REMOTE_PORT = request.client.remotePort || '';
+    conInfo._SERVER.REQUEST_METHOD = request.method || ''; 
+    conInfo._GET = request.query || {};
+    conInfo._FILES = {};
+    for(var f in request.files){
+      conInfo._FILES[f]={};
+      conInfo._FILES[f].name=request.files[f].name;
+      conInfo._FILES[f].size=request.files[f].size;
+      conInfo._FILES[f].tmp_name=request.files[f].path;
+      conInfo._FILES[f].type=request.files[f].type;
+    }
+  }
+
+  /*==========================================================================*\
+  // Non method specifics
+  \*==========================================================================*/
+  conInfo._SERVER.SERVER_PROTOCOL = 
+    extReq.httpVersion ? "HTTP/" + extReq.httpVersion : '';
+
+  conInfo._SERVER.DOCUMENT_ROOT = path.resolve(sphp.docRoot);
+
+  if(request._parsedUrl){
+    conInfo._SERVER.REQUEST_URI = request._parsedUrl.href;
+    conInfo._SERVER.QUERY_STRING = request._parsedUrl.query;
+
+    conInfo._SERVER.SCRIPT_NAME = request._parsedUrl.pathname || '/';
+    if(conInfo._SERVER.SCRIPT_NAME.charAt(0) != '/')
+      conInfo._SERVER.SCRIPT_NAME = '/' + conInfo._SERVER.SCRIPT_NAME;   
+    conInfo._SERVER.PHP_SELF = conInfo._SERVER.SCRIPT_NAME;
+    conInfo._SERVER.SCRIPT_FILENAME = conInfo._SERVER.DOCUMENT_ROOT
+    + conInfo._SERVER.SCRIPT_NAME;
+
+    if(request._parsedUrl.host)   
+      conInfo._SERVER.SERVER_HOST = request._parsedUrl.host; 
+  }    
+
+  if(typeof extReq.headers === 'object')
+      for(var key in extReq.headers)
+        conInfo._SERVER['HTTP_' + key.toUpperCase().replace('-','_')] 
+          = extReq.headers[key];
+
+  if(typeof conInfo._SERVER.HTTP_REFERER !== 'undefined'){
+    var refererUrl = url.parse(conInfo._SERVER.HTTP_REFERER);
+    conInfo._SERVER.SERVER_PORT = refererUrl.port;
+    conInfo._SERVER.SERVER_ADDR = refererUrl.hostname;   
+    if(typeof conInfo._SERVER.SERVER_NAME === 'undefined')
+      conInfo._SERVER.SERVER_NAME = refererUrl.hostname;
+  }  
+
+  if(typeof conInfo._SERVER.HTTP_COOKIE !== 'undefined'){
+    conInfo._SERVER.HTTP_COOKIE_PARSE_RAW = conInfo._SERVER.HTTP_COOKIE;
+    var line = conInfo._SERVER.HTTP_COOKIE_PARSE_RAW.split(';');
+    for(var i in line){
+      var cookie = line[i].split('=');
+      if(cookie.length >0)
+        conInfo._COOKIE[cookie[0].trim()] = cookie[1].trim();
+    }
+  }
+
+  if(typeof request.body !== 'object' && request.body) 
+    try{ 
+      conInfo._POST = JSON.parse(request.body);
+    }catch(e){}
+  else      
+    conInfo._POST = request.body || {};
+
+  conInfo._REQUEST = Object.assign({}, conInfo._GET, conInfo._POST, conInfo._COOKIE);
+ 
+  if(request.session)
+    conInfo._SERVER.SESSION = request.session;
+
+  return conInfo;
 }
