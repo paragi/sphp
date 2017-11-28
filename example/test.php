@@ -1,4 +1,6 @@
-<!DOCTYPE HTML>
+<?php
+  header('Location: http://localhost:8080/test.html');
+?><!DOCTYPE HTML>
 <html>
 <head>
 <title>Test page</title>

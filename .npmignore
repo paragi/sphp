@@ -29,4 +29,12 @@ node_modules
 # Editor backups
 *~
 
+# Test cases
+example-wp.js
+wp
+tmp
+apache.txt
+
+# Other
 notes.txt
+nyt.txt

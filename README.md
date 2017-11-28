@@ -5,13 +5,13 @@ Fast response time is favored over use of resources and performance under load. 
 
 Features:
 * Use PHP in node with express, sessions and websockets. 
-* Transfer node express session to php and reuse session ID and cookie
+* Transfer node express session to php and reuse session ID and cookie from express
 * No dependencies (except for example)
-* Mimic Apache mod_php population of the PH super global $_SERVER
+* Mimic Apache mod_php population of the PHP super globals
 * Highly configurable.
-* Comes with example of a server and a PHP websocket client
+* Comes with an example of a server using PHP websocket client
 
-**Note:** php-cgi must be installed on the system. If its not in the PATH, the variable cgiEngine must be set to point to an executable binary.
+**Note:** php-cgi must be installed. If its not in the PATH, the variable cgiEngine must be set to point to the executable binary.
 
 File upload is disabled at present.
 
@@ -23,7 +23,7 @@ File upload is disabled at present.
 
 Make sure php-cgi is installed (not just php)
 
-    npm install -g express express-session ws body-parser
+    npm install express express-session ws body-parser
 
 Change directory to to where sphp reside (node_module/...):
 
@@ -167,7 +167,9 @@ The aim of this project is to serve PHP scripts with the best response time poss
 
 The responsetime is achieved by sacrificing considerations of resources and performance under load. This is implemented  by pre-emptively loading of the PHP-CGI engine and a user PHP script, typically including generic PHP library. The process is then put on hold until needed.
 
-### Bugfixes
+### Changes
+* 0.5.2 Fixed Websocket parse url bug
+* 0.5.1 Documentation update
 * 0.5.0 Added superglobals preset options
         Fixed Cr/Nl in headers (compattible to express 4)
         fixed too few spare workers started, when minSpareWorkers > default value
@@ -200,10 +202,4 @@ session.sid is no longer set
 ### Help
 I appriciate contributions. Code should look good and compact, and be covered by a test case or example.
 
-in any case don't hesitate to submit an issue on github, with a test case.
-
-
-
-license
-
-
+Don't hesitate to submit an issue on github. But please provide a reproducible example.

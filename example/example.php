@@ -34,6 +34,7 @@ if(isset($_POST['func'])) switch($_POST['func']){
   case 'PHP': // Show Globals
     echo "<pre>Output from ".__FILE__.":</br>";
     echo print_r($GLOBALS,true)."</pre>";
+    echo "__FILE__: ",__FILE__;
     break;
   case 'WS': // Aks the websocket server to show its globals
     $sp=websocket_open('127.0.0.1:8080/ws_request.php?param=php_test',$errstr);

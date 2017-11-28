@@ -40,7 +40,7 @@ process.removeAllListeners('uncaughtException');
 var sessionStore = new expressSession.MemoryStore();
 var sphp = require('./sphp.js');
 var app = express();
-var server = app.listen(8080,'0.0.0.0','',function () {
+var server = app.listen(80,'0.0.0.0','',function () {
   console.log('Server listening at://%s:%s'
     ,server.address().address
     ,server.address().port);

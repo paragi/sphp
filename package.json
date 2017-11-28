@@ -1,6 +1,6 @@
 {
   "name": "sphp",
-  "version": "0.5.0",
+  "version": "0.5.2",
   "description": "A snappy PHP execution module / middleware",
   "main": "sphp.js",
   "scripts": {

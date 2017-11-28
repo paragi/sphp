@@ -53,15 +53,12 @@ sphp.superglobals = {
   ,_SERVER: {
      GATEWAY_INTERFACE: "PHP preburner 0.1.3"
     ,SERVER_SOFTWARE: "PHP Appilation Server using Node.js and WS Websockets"
+    ,SERVER_NAME: "localhost"
   }
   ,_COOKIE: {}
 //  ,_ENV: JSON.parse(JSON.stringify(process.env))
 };
 
-/*                                
-  [SERVER_NAME] => 
-
-*/
 sphp.cgiEngine='php-cgi';
 sphp.minSpareWorkers=10;
 sphp.maxWorkers=20;
@@ -636,7 +633,7 @@ sphp._getConInfo=function(request){
     conInfo._SERVER.REMOTE_PORT = request.socket._socket.remotePort || '';
     conInfo._SERVER.REMOTE_ADDR = request.socket._socket.remoteAddress || '';
     conInfo._SERVER.REQUEST_METHOD = 'websocket';
-    conInfo._GET = url.parse(request._parsedUrl.href, true).query;
+    conInfo._GET = url.parse(request.socket.upgradeReq.url, true).query;
  
    /*==========================================================================*\
     basic HTTP request
@@ -690,7 +687,8 @@ sphp._getConInfo=function(request){
     var refererUrl = url.parse(conInfo._SERVER.HTTP_REFERER);
     conInfo._SERVER.SERVER_PORT = refererUrl.port;
     conInfo._SERVER.SERVER_ADDR = refererUrl.hostname;   
-    if(typeof conInfo._SERVER.SERVER_NAME === 'undefined')
+    if(typeof conInfo._SERVER.SERVER_NAME === 'undefined' 
+      || conInfo._SERVER.SERVER_NAME.length == 0)
       conInfo._SERVER.SERVER_NAME = refererUrl.hostname;
   }  
 

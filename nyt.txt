@@ -5,6 +5,8 @@ doc: Beskriv brug af express session read only...
 prog: parameter til kø eler discard når max worker er nået.
 fejl: WP og cookies
 
+
+fixed Websocket parse url error  
 ----
 
 
