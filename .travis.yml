@@ -17,6 +17,8 @@ before_install:
 addons:
   apt:
     sources:
+    - ubuntu-toolchain-r-test
     - sourceline: 'ppa:ondrej/php'
     packages:
+    - g++-4.8
     - php7.1-cgi
