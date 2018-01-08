@@ -16,13 +16,14 @@ describe('Test Express only', function() {
             sphp.cgiEngine = process.env.PHP_PATH;
         }
 
+        var doc_root = __dirname + path.sep + 'doc_root/';
         var server = app.listen(20000, function() {
-            console.log('SPHP Server started on port 20000 with Doc-Root doc_root');
+            console.log('SPHP Server started on port 20000 with Doc-Root ' + doc_root);
             serving = true;
         });
 
-        app.use(sphp.express('doc_root'));
-        app.use(express.static('doc_root'));
+        app.use(sphp.express(doc_root));
+        app.use(express.static(doc_root));
 
         _done();
     });
