@@ -1,6 +1,7 @@
 /* jshint -W097 */// jshint strict:false
 /*jslint node: true */
 var expect = require('chai').expect;
+var path = require('path');
 var request = require('request');
 
 var express = require('express');
