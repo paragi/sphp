@@ -7,11 +7,11 @@ var request = require('request');
 var express = require('express');
 var sphp = require('../sphp');
 
+var serving = false;
 describe('Test Express only', function() {
     before('Setup Server', function (_done) {
         this.timeout(600000); // because of first install from npm
 
-        var serving = false;
         var app = express();
         if (process.env.PHP_PATH && process.env.PHP_PATH !== "") {
             sphp.cgiEngine = process.env.PHP_PATH;
