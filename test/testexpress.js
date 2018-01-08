@@ -17,7 +17,7 @@ describe('Test Express only', function() {
         }
 
         var server = app.listen(20000, function() {
-            console.log.info('SPHP Server started on port 20000 with Doc-Root doc_root');
+            console.log('SPHP Server started on port 20000 with Doc-Root doc_root');
             serving = true;
         });
 
@@ -43,12 +43,10 @@ describe('Test Express only', function() {
         try {
             if (serving) {
                 app.close();
-                console.log.info('SPHP Server stopped');
+                console.log('SPHP Server stopped');
             }
-            if (callback) callback();
         } catch (e) {
-            if (callback) callback();
         }
-
+        done();
     });
 });
