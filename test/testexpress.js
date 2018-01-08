@@ -4,7 +4,7 @@ var expect = require('chai').expect;
 var request = require('request');
 
 var express = require('express');
-var sphp = require('sphp');
+var sphp = require('../sphp');
 
 describe('Test Express only', function() {
     before('Setup Server', function (_done) {
