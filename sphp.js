@@ -98,6 +98,9 @@ sphp.getVersion = function () {
 
 \*============================================================================*/
 sphp.express = function (options) {
+    if (typeof options !== 'object') {
+        options = {'docRoot': options};
+    }
     options = options || {};
 
     if (/^win/.test(process.platform)) {
