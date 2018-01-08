@@ -117,7 +117,8 @@ sphp.express = function (options) {
     sphp.getVersion();
 
     // Find absolute path to this directory and add script name
-    sphp.preBurnerScript = path.join(sphp.docRoot, 'php_worker.php');
+    sphp.preBurnerScript=module.filename.substring(0,module.filename.lastIndexOf(path.sep));
+    sphp.preBurnerScript+='/php_worker.php';
 
     // Return middleware function
     return function (request, response, next) {
