@@ -126,7 +126,7 @@ sphp.express = function (options) {
 
         // Launch script
         sphp.exec(request, function (event, data, param) {
-            // console.debug('----Receiving ',event,' With: ',data,':',param);
+            // console.log('----Receiving ',event,' With: ',data,':',param);
             if (!response.finished) {
                 switch (event) {
                     case 'status':
@@ -186,7 +186,7 @@ sphp.exec = function (request, callback) {
         request._parsedUrl = url.parse(request.socket.upgradeReq.url);
     }
 
-    console.debug('EXEC: ' + path.join(sphp.docRoot, request._parsedUrl.pathname));
+    console.log('EXEC: ' + path.join(sphp.docRoot, request._parsedUrl.pathname));
     // Check that script exists
     fs.exists(path.join(sphp.docRoot, request._parsedUrl.pathname), function (exists) {
         // Deploy worker
@@ -482,7 +482,7 @@ sphp.maintain = function () {
     }
 
     function FormDebugMessage(worker, event, error) {
-        //console.debug('FormDebugMessage this',this);
+        //console.log('FormDebugMessage this',this);
         var str = 'PHP worker script ended with error.';
         str += '\n  PHP engine: ' + sphp.cgiEngine;
         str += '\n  Preburner script: ' + sphp.preBurnerScript;
@@ -623,7 +623,7 @@ sphp._responseHandler = function (worker, callback) {
     })(worker, callback));
 
     function endWithGrace(worker, callback) {
-        //console.debug('Closeing event this:',worker);
+        //console.log('Closeing event this:',worker);
         if (worker.proc.state === 'running') {
             worker.proc.state = 'dead';
             if (!worker.proc.headersSent) {
