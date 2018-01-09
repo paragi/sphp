@@ -103,10 +103,12 @@ sphp.express = function (options) {
     }
     options = options || {};
 
-    if (/^win/.test(process.platform)) {
-        sphp.cgiEngine = 'php-cgi.exe';
-    } else {
-        sphp.cgiEngine = 'php-cgi';
+    if (sphp.cgiEngine === undefined) {
+        if (/^win/.test(process.platform)) {
+            sphp.cgiEngine = 'php-cgi.exe';
+        } else {
+            sphp.cgiEngine = 'php-cgi';
+        }
     }
 
     // Initialize once

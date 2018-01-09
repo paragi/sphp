@@ -15,6 +15,7 @@ describe('Test Express only', function() {
         var app = express();
         if (process.env.PHP_PATH && process.env.PHP_PATH !== "") {
             sphp.cgiEngine = process.env.PHP_PATH;
+            console.log('SPHP Use cgiEngine ' + sphp.cgiEngine);
         }
 
         var doc_root = __dirname + path.sep + 'doc_root/';
