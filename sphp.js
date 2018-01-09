@@ -59,7 +59,12 @@ sphp.superglobals = {
 //  ,_ENV: JSON.parse(JSON.stringify(process.env))
 };
 
-sphp.cgiEngine='php-cgi';
+if (/^win/.test(process.platform)) {
+    sphp.cgiEngine = 'php-cgi.exe';
+} else {
+    sphp.cgiEngine = 'php-cgi';
+}
+
 sphp.minSpareWorkers=10;
 sphp.maxWorkers=20;
 sphp.stepDowntime=360;
