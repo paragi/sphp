@@ -41,6 +41,17 @@ describe('Test Express only', function() {
         });
     });
 
+    it('Test required-phpinfo()', function (done) {
+        request('http://127.0.0.1:20000/subdir/required-phpinfo.php', function (error, response, body) {
+            console.log('BODY: ' + body);
+            expect(serving).to.be.true;
+            expect(error).to.be.not.ok;
+            expect(body.indexOf('<title>phpinfo()</title>')).to.be.not.equal(-1);
+            expect(response.statusCode).to.equal(200);
+            done();
+        });
+    });
+
     after('Stop Server', function (done) {
         this.timeout(10000);
         try {
