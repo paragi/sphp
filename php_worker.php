@@ -11,11 +11,11 @@
 
   This is a close aproximation to the population of globals done by mod_php in Apache
 
-todo: 
+todo:
   fake header()
   set ini open_basedir
   file upload
-  
+
 \* ======================================================================== */
 // Prevent that the input socket times out, before it is used
 ini_set ("default_socket_timeout","-1" );
@@ -26,7 +26,7 @@ ini_set ("default_socket_timeout","-1" );
 //   Get client request and server information passed throug stdin.
 $request=json_decode(file_get_contents("php://stdin"),true);
 
-// Populate predefined global variables, including all http headers 
+// Populate predefined global variables, including all http headers
 unset($_SERVER,$_REQUEST);
 foreach($request as $key => $value)
   $$key = $value;
@@ -35,9 +35,9 @@ foreach($request as $key => $value)
 unset($request, $key, $value);
 
 // Set server signature
-$_SERVER['GATEWAY_INTERFACE'] = "PHP CGI and SPHP worker 0.2.0"; 
-$_SERVER['SERVER_SIGNATURE'] = 
-   "<address>" 
+$_SERVER['GATEWAY_INTERFACE'] = "PHP CGI and SPHP worker 0.2.0";
+$_SERVER['SERVER_SIGNATURE'] =
+   "<address>"
    . $_SERVER['SERVER_SOFTWARE']
   . ". With " . $_SERVER['GATEWAY_INTERFACE']
   . (empty($_SERVER['SERVER_HOST']) ? '' : " at " . $_SERVER['SERVER_HOST'])
@@ -46,7 +46,7 @@ $_SERVER['SERVER_SIGNATURE'] =
 
 // Run script
 if(realpath($_SERVER['SCRIPT_FILENAME'])){
-  chdir($_SERVER['DOCUMENT_ROOT']);
+  chdir(dirname($_SERVER['SCRIPT_FILENAME']));
   require $_SERVER['SCRIPT_FILENAME'];
 }else{
   trigger_error("File $_SERVER[SCRIPT_FILENAME] Missing", E_USER_ERROR);
