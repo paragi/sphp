@@ -369,7 +369,7 @@ sphp.maintain=function(){
     // Start child process and Append worker to array
     sphp.worker.unshift(
       child_process.spawn(sphp.cgiEngine
-        ,[sphp.preBurnerScript]
+        ,[sphp.preBurnerScript] // Not working as of 6.12
         ,{ cwd: sphp.docRoot
           ,env: {'preload':sphp.docRoot +'/'+ sphp.preLoadScript}
         }
