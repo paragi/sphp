@@ -200,6 +200,6 @@ session.sid is no longer set
 * 0.3.5  open_basedir restriction, without specifying doc roor in php.ini
 
 ### Help
-I appriciate contributions. Code should look good and compact, and be covered by a test case or example.
+I appreciate contributions. Code should look good and compact, and be covered by a test case or example.
 
 Don't hesitate to submit an issue on github. But please provide a reproducible example.
