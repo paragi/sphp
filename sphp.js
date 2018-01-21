@@ -204,6 +204,8 @@ sphp.exec=function(request,callback){
       
 \*============================================================================*/
 sphp.websocket = function (opt){
+  var regExp = new RegExp('(^|;)\\s*' + opt.name + '\\s*=\\s*([^;]+)');
+  
   return function(socket,IncomingMessage) {
     //console.info("Client connected");
 
@@ -228,8 +230,7 @@ sphp.websocket = function (opt){
       //console.log("WS Headers: ",socket.upgradeReq.headers);
       
       // Find session cookie content, by name
-      parts=unescape(socket.upgradeReq.headers.cookie).match(
-        '(^|;)\\s*' + opt.name + '\\s*=\\s*([^;]+)');
+      parts = regExp.test(decodeURI(socket.upgradeReq.headers.cookie));
       //logger.debug("ws session parts: ",parts);        
       if(parts){
         request.sessionID=parts[0].split(/[=.]/)[1];
@@ -674,10 +675,6 @@ sphp._getConInfo=function(request){
 
   /*==========================================================================*\
   // Non method specifics
-  
-  
-  
-  
   \*==========================================================================*/
   conInfo._SERVER.SERVER_PROTOCOL = 
     extReq.httpVersion ? "HTTP/" + extReq.httpVersion : '';
