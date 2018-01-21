@@ -21,7 +21,9 @@ todo:
 ini_set ("default_socket_timeout","-1" );
 
 // include pre load script
-include(getenv('preload'));
+$pre_load_script = getenv('preload');
+if(!empty($pre_load_script))
+  include($pre_load_script);
 
 //   Get client request and server information passed throug stdin.
 $request=json_decode(file_get_contents("php://stdin"),true);

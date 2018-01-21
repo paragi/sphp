@@ -1,11 +1,8 @@
 {
   "name": "sphp",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "A snappy PHP execution module / middleware",
   "main": "sphp.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "runkitExampleFilename": "browser.js",
   "repository": {
     "type": "git",
@@ -22,7 +19,7 @@
     "fast",
     "php"
   ],
-  "author": "Paragi Aps, Simon Rigét <simon.riget@gmail.com> 2014",
+  "author": "Paragi Aps, Simon Rigét <simon.riget@gmail.com> 2013",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/paragi/sphp/issues"
@@ -39,15 +36,12 @@
   },
   "peerDependencies": {},
   "directories": {
-    "example": "example"
+    "example": "example",
+    "test": "test"
   },
   "scripts": {
     "test": "node node_modules/mocha/bin/mocha --exit"
   },
   "dependencies": {
-    "body-parser": "^1",
-    "express": "^4",
-    "express-session": "^1",
-    "ws": "^3"
   }
 }

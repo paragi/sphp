@@ -12,13 +12,13 @@ describe('Test Express only', function() {
     before('Setup Server', function (_done) {
         this.timeout(600000); // because of first install from npm
 
+        var doc_root = __dirname + path.sep + 'doc_root';
         var app = express();
         if (process.env.PHP_PATH && process.env.PHP_PATH !== "") {
-            sphp.cgiEngine = process.env.PHP_PATH;
+            sphp.setOptions({docRoot: doc_root, cgiEngine: process.env.PHP_PATH});
             console.log('SPHP Use cgiEngine ' + sphp.cgiEngine);
         }
 
-        var doc_root = __dirname + path.sep + 'doc_root/';
         var server = app.listen(20000, function() {
             console.log('SPHP Server started on port 20000 with Doc-Root ' + doc_root);
             serving = true;

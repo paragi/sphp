@@ -33,6 +33,7 @@ var express = require('express');
 var expressSession = require('express-session');
 var bodyParser = require('body-parser');
 var _ws = require('ws');
+var path = require('path');
 
 process.removeAllListeners('uncaughtException');
 
@@ -46,9 +47,11 @@ var server = app.listen(8080,'0.0.0.0','',function () {
     ,server.address().port);
 });
 var ws = new _ws.Server({server: server});
-var thisPath = module.filename.substring(0,module.filename.lastIndexOf("/"));
 
 // Set up session. store and name must be set, for sphp to catch it
+
+var docRoot = module.filename.substring(0,module.filename.lastIndexOf(path.sep)) + '/example/';
+
 var sessionOptions={
    store: sessionStore
   ,secret:'yes :c)'
@@ -58,7 +61,10 @@ var sessionOptions={
   ,name: 'SID'
 }
 
-sphp.overwriteWSPath="/ws_request.php";
+var sphpOptions = {
+   overwriteWSPath: "/ws_request.php"
+  ,docRoot: docRoot
+}
 /*============================================================================*\
   Middleware
 \*============================================================================*/
@@ -76,7 +82,7 @@ app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({extended: true})); // to support URL-encoded bodies
 
 // Attach sPHP
-app.use(sphp.express(thisPath+'/example/'));
+app.use(sphp.express(sphpOptions));
 
 // Attach sPHP execution to the websocket connect event
 ws.on('connection',sphp.websocket(sessionOptions));
@@ -87,5 +93,5 @@ app.use(function(request, response, next){
     request._parsedUrl.pathname='/example.html';
   next();
 });
-app.use(express.static(thisPath+'/example/'));
+app.use(express.static(docRoot));
 
