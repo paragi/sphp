@@ -1,6 +1,5 @@
 /*============================================================================*\
   Snappy PHP Script Launcher
-  (c) Copyrights Paragi, Simon Riget 2013
 
   PHP script execution module for node
   Maintain a pool of ready workers for fast responcetime.
@@ -14,17 +13,20 @@
   To attach to websocket server:
     ws.on('connection',sphp.websocket(<options>));
 
+  (c) Copyrights Paragi, Simon Riget 2013
+  License MIT
 \*============================================================================*/
-var moduleVersion = 'Snappy PHP ' + require('./package.json').version;
-
 var fs = require('fs');
 var path = require('path');
 var child_process = require('child_process');
 var url = require('url');
 
+var moduleVersion = 'Snappy PHP ' + require('.' + path.sep + 'package.json').version;
+
 // Define module object
 var sphp = {};
 module.exports = exports = sphp;
+
 
 // Initialize
 sphp.worker=[]; 
