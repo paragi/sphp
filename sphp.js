@@ -21,12 +21,11 @@ var path = require('path');
 var child_process = require('child_process');
 var url = require('url');
 
-var moduleVersion = 'Snappy PHP ' + require('.' + path.sep + 'package.json').version;
+var moduleVersion = 'Snappy PHP ' + require(__dirname + path.sep + 'package.json').version;
 
 // Define module object
 var sphp = {};
 module.exports = exports = sphp;
-
 
 // Initialize
 sphp.worker=[]; 
@@ -117,7 +116,9 @@ sphp.exec=function(request,callback){
   if(sphp.worker.length < 1)
     sphp.maintain();
 
-  if(typeof process.versions.php === 'undefined'){
+// Check disabled for now. Is consistency really that important here? or  is it 
+// ok that PHP version is unknown to the first instanses of PHP scripts?
+  if(false && typeof process.versions.php === 'undefined'){
     console.log('PHP engine is not initialized yet. The request was droped');
     return;
   }
@@ -206,7 +207,7 @@ sphp.exec=function(request,callback){
       
 \*============================================================================*/
 sphp.websocket = function (opt){
-  var regExp = new RegExp('(^|;)\\s*' + opt.name + '\\s*=\\s*([^;]+)');
+  var sessionCookieRegExp = new RegExp('(^|;)\\s*' + opt.name + '\\s*=\\s*([^;]+)');
   
   return function(socket,IncomingMessage) {
     //console.info("Client connected");
@@ -232,10 +233,10 @@ sphp.websocket = function (opt){
       //console.log("WS Headers: ",socket.upgradeReq.headers);
       
       // Find session cookie content, by name
-      parts = regExp.test(decodeURI(socket.upgradeReq.headers.cookie));
-      //logger.debug("ws session parts: ",parts);        
+      parts = decodeURI(socket.upgradeReq.headers.cookie).match(sessionCookieRegExp);
+      //console.log("ws session parts: ",parts);        
       if(parts){
-        request.sessionID=parts[0].split(/[=.]/)[1];
+        request.sessionID = parts[0].split(/[=.]/)[1];
         // SID is serialised. Use value between s: and . as index (SID)
         if(request.sessionID.substr(0,2) == 's:')
           request.sessionID=request.sessionID.substr(2);
@@ -274,7 +275,7 @@ sphp.websocket = function (opt){
   sphp.setOptions(options); 
   All options has been set to a defauls value
 \*============================================================================*/
-sphp.setOptions = function(option){  
+sphp.setOptions = function(option, callback){  
   if(typeof option !== 'object') return;
     
   // Configure/overwrite option if any
@@ -306,11 +307,13 @@ sphp.setOptions = function(option){
     child.on('close', function () {
       process.versions.php = child.resp.split('\n')[0];
       console.log("PHP engine: " + process.versions.php);
+      if(typeof callback === 'function') callback(null);
     });
     
-    child.on('error', (err) => {
+    child.on('error', (error) => {
       console.log('PHP engine failed to start (' + sphp.cgiEngine +')');
-      throw new Error(err)
+      //throw new Error(err)
+      if(typeof callback === 'function') callback(error);      
     });
   }
 }
@@ -740,15 +743,16 @@ sphp._getConInfo=function(request){
 
 // Set defaults
 sphp.setOptions({
-   docRoot:         path.resolve("." + path.sep + 'public')
+   docRoot:         path.resolve(__dirname + path.sep + 'public')
   ,minSpareWorkers: 10
   ,maxWorkers:      20
   ,stepDowntime:    360
   ,overwriteWSPath: null
   ,cgiEngine:       'php-cgi' + (/^win/.test(process.platform) ? '.exe'  : '')
   // Find absolute path to this directory and add script name
-  ,workerScript:    module.filename.substring(0,module.filename.lastIndexOf(path.sep)) 
-                    + path.sep + 'php_worker.php'
+//  ,workerScript:    module.filename.substring(0,module.filename.lastIndexOf(path.sep)) 
+//                    + path.sep + 'php_worker.php'
+  ,workerScript:    __dirname + path.sep + 'php_worker.php'
   ,superglobals: {
     _POST: {},
     _GET: {},
