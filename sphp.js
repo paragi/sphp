@@ -311,8 +311,9 @@ sphp.setOptions = function(option, callback){
       process.versions.php = child.resp.split('\n')[0];
       if(process.versions.php.length <1)
         throw new Error("PHP engine '" +sphp.cgiEngine + "' failed to start.");
-      else
-        console.log("PHP engine: " + process.versions.php);
+      console.log("PHP engine: " + process.versions.php);
+      if( typeof callback === 'function') 
+        callback();
     });
     
     child.on('error', (error) => {
