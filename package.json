@@ -1,6 +1,6 @@
 {
   "name": "sphp",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A snappy PHP execution module / middleware",
   "main": "sphp.js",
   "runkitExampleFilename": "browser.js",
