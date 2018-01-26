@@ -743,15 +743,12 @@ sphp._getConInfo=function(request){
 
 // Set defaults
 sphp.setOptions({
-   docRoot:         path.resolve(__dirname + path.sep + 'public')
+   docRoot:         path.resolve("." + path.sep + 'public')
   ,minSpareWorkers: 10
   ,maxWorkers:      20
   ,stepDowntime:    360
   ,overwriteWSPath: null
   ,cgiEngine:       'php-cgi' + (/^win/.test(process.platform) ? '.exe'  : '')
-  // Find absolute path to this directory and add script name
-//  ,workerScript:    module.filename.substring(0,module.filename.lastIndexOf(path.sep)) 
-//                    + path.sep + 'php_worker.php'
   ,workerScript:    __dirname + path.sep + 'php_worker.php'
   ,superglobals: {
     _POST: {},
