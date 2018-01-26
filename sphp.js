@@ -298,22 +298,25 @@ sphp.setOptions = function(option, callback){
   if(typeof option.cgiEngine === 'string'){
     var child = child_process.spawn(option.cgiEngine, ['-v']);
     child.resp = '';
+
     child.stdout.on('data', function (buffer) {
       child.resp += buffer.toString();
     });
+
     child.stderr.on('data', function (buffer) {
       child.resp += buffer.toString();
     });
+
     child.on('close', function () {
       process.versions.php = child.resp.split('\n')[0];
-      console.log("PHP engine: " + process.versions.php);
-      if(typeof callback === 'function') callback(null);
+      if(process.versions.php.length <1)
+        throw new Error("PHP engine '" +sphp.cgiEngine + "' failed to start.");
+      else
+        console.log("PHP engine: " + process.versions.php);
     });
     
     child.on('error', (error) => {
-      console.log('PHP engine failed to start (' + sphp.cgiEngine +')');
-      //throw new Error(err)
-      if(typeof callback === 'function') callback(error);      
+      throw new Error('PHP engine failed to start (' + sphp.cgiEngine +')');
     });
   }
 }
