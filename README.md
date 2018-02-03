@@ -121,24 +121,24 @@ or alternatively parsed with the express middleware setup:
 
 	app.use(sphp.express(sphpOptions));
 
+To set the server name:
+
+	sphp.setOptions({superglobals: {_SERVER: {SERVER_NAME: "MyServer.com"}}});
+	
+To load the enviroment variables:
+
+    sphp.setOptions({superglobals: {_ENV: JSON.parse(JSON.stringify(process.env)}});
 
 |variable name |  |
 |---|---|
-|cgiEngine |(Default: php-cgi) Specify which binary file to use to execute PHP script. The executable must be in the environment PATH or use a full path to the executable file.|
-|docRoot |(default: ./public) Where to serve script files from. Might be relative or an absolute path. This is the variable set, when sphp.express is called with a parameter.|
-|minSpareWorkers |(Default: 2) Define the minimum number of workers kept ready. 
-Note that when calling PHP scripts through websockets, an additional concurrent worker is used. |
-|maxWorkers |(Default: 10) The maximum number of workers allowed to start. This number will never be exceeded. Requests will instead be rejected. Set this to limit the amount of RAM the server can use, when load is high. The footprint is about 20MB / worker as of php-cgi 5.4 php-gci 
-|stepDowntime |(Default: 360 seconds) The number of worker are increased dynamically, When the need arises. This is the time it takes before, the number of workers, are reduced by one.|
-|overwriteWSPath |(Default null) Used to specify which script should serve a websocket request.
-If null, the URL of the connection GET request is used. The path is relative to docRoot.|
-|preLoadScript |(Default null) This can be used to preload libraries, before a page is requested, thus improving reaponcetime. The preLoadScript variable contains a path to a php script, relative to docRoot. Be aware that the script pointet to will be executed when the php engine is loaded eg. before a client has made a page request. non of the super globals are set to usefull values at this point. The script sould contain generic library function that are use system wide, as it will be loaded with all page.|
-|superglobals | This can be used to preset PHP superglobals like $_SERVER['SERVER_NAME'] Any variable can be set, but will be overwriten, if the mane is one of thouse that is set during request time.<br>
-To set the server name:<br>
-    ```sphp.superglobals._SERVER.SERVER_NAME = 'MyServer.com';```
-To load the enviroment variables:<br>
-    ```sphp.superglobals._ENV = JSON.parse(JSON.stringify(process.env));```
-The following variables are predefined and will be futher populated at request time:<br>
+|cgiEngine |Default: "php-cgi" Specify which binary file to use to execute PHP script. The executable must be in the environment PATH or use a full path to the executable file.|
+|docRoot |(default: "./public" Where to serve script files from. Might be relative or an absolute path. This is the variable set, when sphp.express is called with a parameter.|
+|minSpareWorkers |Default: 2. Define the minimum number of workers kept ready. <br>Note that when calling PHP scripts through websockets, an additional concurrent worker is used. |
+|maxWorkers |Default: 10. The maximum number of workers allowed to start. This number will never be exceeded. Requests will instead be rejected. Set this to limit the amount of RAM the server can use, when load is high. The footprint is about 20MB / worker as of php-cgi 5.4 php-gci. 
+|stepDowntime |Default: 360 seconds. The number of worker are increased dynamically, When the need arises. This is the time it takes before, the number of workers, are reduced by one.|
+|overwriteWSPath |Default null. Used to specify which script should serve a websocket request.<br>If null, the URL of the connection GET request is used. The path is relative to docRoot.|
+|preLoadScript |Default null. This can be used to preload libraries, before a page is requested, thus improving reaponcetime. The preLoadScript variable contains a path to a php script, relative to docRoot. Be aware that the script pointet to will be executed when the php engine is loaded eg. before a client has made a page request. non of the super globals are set to usefull values at this point. The script sould contain generic library function that are use system wide, as it will be loaded with all page.|
+|superglobals | This can be used to preset PHP superglobals like $_SERVER['SERVER_NAME'] Any variable can be set, but will be overwriten, if the name is one of thouse that is set during request time.<br>The following variables are predefined and will be futher populated at request time:<br>
     _POST
     _GET
     _FILES
