@@ -147,8 +147,8 @@ The responsetime is achieved by sacrificing considerations of resources and perf
 
 ### Changes
 * 0.6.2 Super global SERVER_NAME respects option setting over value generated at request time
-	Minor consistance corrections in the code
-	Documentation update 
+	      Minor consistance corrections in the code
+      	Documentation update 
 * 0.6.1 Fixed direct call to sphp.exec to function, before express is started.
 * 0.6.0 Adapted to windows and OSX platforms
         Option settings changed to match recognised usual praxis for express middleware
