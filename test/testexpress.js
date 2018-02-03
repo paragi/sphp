@@ -6,13 +6,25 @@ var request = require('request');
 
 var express = require('express');
 var sphp = require('../sphp');
+var expressSession = require('express-session');
+var bodyParser = require('body-parser');
+var _ws = require('ws');
 
 var serving = false;
-describe('Test Express only', function() {
+describe('Test Express server', function() {
     before('Setup Server', function (_done) {
         this.timeout(600000); // because of first install from npm
 
         var doc_root = __dirname + path.sep + 'doc_root';
+        var sessionStore = new expressSession.MemoryStore();
+        var sessionOptions={
+             store: sessionStore
+            ,secret:'yes :c)'
+            ,resave:false
+            ,saveUninitialized:false
+            ,rolling: true
+            ,name: 'SID'
+        }
         var app = express();
         if (process.env.PHP_PATH && process.env.PHP_PATH !== "") {
             sphp.setOptions({docRoot: doc_root, cgiEngine: process.env.PHP_PATH});
@@ -23,6 +35,12 @@ describe('Test Express only', function() {
             console.log('SPHP Server started on port 20000 with Doc-Root ' + doc_root);
             serving = true;
         });
+
+        var ws = new _ws.Server({server: server});
+        app.use(expressSession(sessionOptions));
+        app.use(bodyParser.json());  
+        app.use(bodyParser.urlencoded({extended: true})); 
+        ws.on('connection',sphp.websocket(sessionOptions));
 
         app.use(sphp.express(doc_root));
         app.use(express.static(doc_root));

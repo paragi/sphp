@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Snappy PHP</title>
+<title>Websocket test</title>
 <link rel="stylesheet" type="text/css" href="base.css" />
 <script type="text/javascript">
   // Make websocket connection and define with script to call on messages
@@ -19,7 +19,9 @@
   }
 
   // Compose some jason to post, when the user clicks the send button
-  var post=JSON.stringify({"Browser": "request"});
+  ws.send(JSON.stringify({"Browser": "request"}));
+  
+  usleep
 </script>
 </head>
 

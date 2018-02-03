@@ -1,7 +1,7 @@
 ## Snappy PHP for node js
 A snappy PHP module / middleware.
 
-Fast response time is favored over use of resources and performance under load. This package is best suited embedded system and small application with few user, where you just need a fast response time without much load.
+Fast response time is favored over use of resources and performance under load. This package is best suited embedded system and small application with few user, where you just need a fastest response time without much load.
 
 Features:
 * Use PHP in node with express, sessions and websockets. 
@@ -21,7 +21,7 @@ File upload is disabled at present.
     
 #### Run example server
 
-Make sure php-cgi is installed (not just php)
+Make sure php-cgi is installed and in the path. (not just php)
 
     npm install express express-session ws body-parser
 
@@ -100,67 +100,45 @@ You should now se the example pages.
 
 
 ### Configuration
-sPHP module variables are exposed, for easy configuration:
+SPHP settings can be changed by parsing an array of options to change to the setOptions or express methods. 
 
-##### cgiEngine (Default: php-cgi)
-Specify which binary file to use to execute PHP script. The executable must be in the environment PATH or use a full path to the executable file.
+Set all options:
 
-    sphp.cgiEngine='php';
+	var sphpOptions = {
+ 	     cgiEngine: “/usr/bin/php-cgi'
+	    ,docRoot: “/home/of/my/pubnlic/files”
+	    ,minSpareWorkers: 4
+	    ,maxWorkers: 20
+	    ,stepDowntime: 1800
+	    ,overwriteWSPath: “/ws_serveice.php”
+	    , preLoadScript: “pre_load.php”
+	    ,superglobals: {_SERVER.SERVER_NAME: “MyServer.com”}
+	};
+    
+	sphp.setOptions(sphpOptions);
 
-##### docRoot (default: ./public)
-Where to serve script files from. Might be relative or an absolute path. This is the variable set, when sphp.express is called with a parameter.
+or alternatively parsed with the express middleware setup:
 
-    sphp.docRoot='./my_files';
-
-##### minSpareWorkers (Default: 2)
-Define the minimum number of workers kept ready. 
-Note that when calling PHP scripts through websockets, an additional concurrent worker is used. 
-
-
-    sphp.minSpareWorkers=4;
-
-##### maxWorkers (Default: 10)
-The maximum number of workers allowed to start. This number will never be exceeded. Requests will instead be rejected.
-
-Set this to limit the amount of RAM the server can use, when load is high. The footprint is about 20MB / worker as of php-cgi 5.4 php-gci
-
-    sphp.maxWorkers=20;
-
-##### stepDowntime (Default: 360 seconds)
-The number of worker are increased dynamically, When the need arises. This is the time it takes before, the number of workers, are reduced by one.
-
-    sphp.stepDowntime=1800;
-
-##### overwriteWSPath (Default null)
-Used to specify which script should serve a websocket request.
-If null, the URL of the connection GET request is used.
-The path is relative to docRoot.
-
-    sphp.overwriteWSPath='/ws_serveice.php';
-
-##### preLoadScript (Default null)
-This can be used to preload libraries, before a page is requested, thus improving reaponcetime.
-The preLoadScript variable contains a path to a php script, relative to docRoot.
-Be aware that the script pointet to will be executed when the php engine is loaded eg. before a client has made a page request. non of the super globals are set to usefull values at this point. The script sould contain generic library function that are use system wide, as it will be loaded with all page.
-
-    sphp.overwriteWSPath='library.php';
-
-##### superglobals 
-This can be used to preset PHP superglobals like $_SERVER['SERVER_NAME'] 
-Any variable can be set, but will be overwriten, if the mane is one of thouse that is set during request time.
+	app.use(sphp.express(sphpOptions));
 
 To set the server name:
-    sphp.superglobals._SERVER.SERVER_NAME = 'MyServer.com';
 
+	sphp.setOptions({superglobals: {_SERVER: {SERVER_NAME: "MyServer.com"}}});
+	
 To load the enviroment variables:
-    sphp.superglobals._ENV = JSON.parse(JSON.stringify(process.env));
 
-The following variables are predefined and will be futher populated at request time:
-    _POST
-    _GET
-    _FILES
-    _SERVER: SERVER_SOFTWARE, SERVER_NAME
-    _COOKIE
+    sphp.setOptions({superglobals: {_ENV: JSON.parse(JSON.stringify(process.env)}});
+
+|variable name |  |
+|---|---|
+|cgiEngine |Default: "php-cgi" Specify which binary file to use to execute PHP script. The executable must be in the environment PATH or use a full path to the executable file.|
+|docRoot |(default: "./public" Where to serve script files from. Might be relative or an absolute path. This is the variable set, when sphp.express is called with a parameter.|
+|minSpareWorkers |Default: 2. Define the minimum number of workers kept ready. <br>Note that when calling PHP scripts through websockets, an additional concurrent worker is used. |
+|maxWorkers |Default: 10. The maximum number of workers allowed to start. This number will never be exceeded. Requests will instead be rejected. Set this to limit the amount of RAM the server can use, when load is high. The footprint is about 20MB / worker as of php-cgi 5.4 php-gci. 
+|stepDowntime |Default: 360 seconds. The number of worker are increased dynamically, When the need arises. This is the time it takes before, the number of workers, are reduced by one.|
+|overwriteWSPath |Default null. Used to specify which script should serve a websocket request.<br>If null, the URL of the connection GET request is used. The path is relative to docRoot.|
+|preLoadScript |Default null. This can be used to preload libraries, before a page is requested, thus improving reaponcetime. The preLoadScript variable contains a path to a php script, relative to docRoot. Be aware that the script pointet to will be executed when the php engine is loaded eg. before a client has made a page request. non of the super globals are set to usefull values at this point. The script sould contain generic library function that are use system wide, as it will be loaded with all page.|
+|superglobals | This can be used to preset PHP superglobals like $_SERVER['SERVER_NAME'] Any variable can be set, but will be overwriten, if the name is one of thouse that is set during request time, except SERVER_NAME.<br>The following variables are predefined and will be futher populated at request time:<br>    _POST<br>    _GET<br>    _FILES<br>    _SERVER: SERVER_SOFTWARE,    SERVER_NAME<br>    _COOKIE|
 
 ### Notes
 The aim of this project is to serve PHP scripts with the best response time possible. Another important functionality is integration with websocket and access to the express servers session data.
@@ -168,6 +146,16 @@ The aim of this project is to serve PHP scripts with the best response time poss
 The responsetime is achieved by sacrificing considerations of resources and performance under load. This is implemented  by pre-emptively loading of the PHP-CGI engine and a user PHP script, typically including generic PHP library. The process is then put on hold until needed.
 
 ### Changes
+* 0.6.2 Super global SERVER_NAME respects option setting over value generated at request time
+	Minor consistance corrections in the code
+	Documentation update 
+* 0.6.1 Fixed direct call to sphp.exec to function, before express is started.
+* 0.6.0 Adapted to windows and OSX platforms
+        Option settings changed to match recognised usual praxis for express middleware
+        Improved tests structure
+        Check validity of PHP engine and respond with clearer error messages if missing
+        Check and report PHP version in process.versions
+        Report SPHP version correct in all instances
 * 0.5.2 Fixed Websocket parse url bug
 * 0.5.1 Documentation update
 * 0.5.0 Added superglobals preset options
@@ -201,5 +189,7 @@ session.sid is no longer set
 
 ### Help
 I appreciate contributions. Code should look good and compact, and be covered by a test case or example.
+Please don't change the formatting style laid out, without a good reason. I know its not the most common standard, but its a rather efficient one with node.
 
 Don't hesitate to submit an issue on github. But please provide a reproducible example.
+
