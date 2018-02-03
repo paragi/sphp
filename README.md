@@ -123,11 +123,21 @@ or alternatively parsed with the express middleware setup:
 
 To set the server name:
 
-	sphp.setOptions({superglobals: {_SERVER: {SERVER_NAME: "MyServer.com"}}});
+	sphp.setOptions({
+	  superglobals: {
+	    _SERVER: {
+	      SERVER_NAME: "MyServer.com"
+	    }
+	  }
+	});
 	
 To load the enviroment variables:
 
-    sphp.setOptions({superglobals: {_ENV: JSON.parse(JSON.stringify(process.env)}});
+    sphp.setOptions({
+      superglobals: {
+        _ENV: JSON.parse(JSON.stringify(process.env)
+      }
+    });
 
 |variable name |  |
 |---|---|
