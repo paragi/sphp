@@ -189,5 +189,6 @@ session.sid is no longer set
 
 ### Help
 I appreciate contributions. Code should look good and compact, and be covered by a test case or example.
+Please don't change the formatting style laid out, without a good reason. I know its not the most common standard, but its a rather efficient one with node.
 
 Don't hesitate to submit an issue on github. But please provide a reproducible example.
