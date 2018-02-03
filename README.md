@@ -138,12 +138,7 @@ To load the enviroment variables:
 |stepDowntime |Default: 360 seconds. The number of worker are increased dynamically, When the need arises. This is the time it takes before, the number of workers, are reduced by one.|
 |overwriteWSPath |Default null. Used to specify which script should serve a websocket request.<br>If null, the URL of the connection GET request is used. The path is relative to docRoot.|
 |preLoadScript |Default null. This can be used to preload libraries, before a page is requested, thus improving reaponcetime. The preLoadScript variable contains a path to a php script, relative to docRoot. Be aware that the script pointet to will be executed when the php engine is loaded eg. before a client has made a page request. non of the super globals are set to usefull values at this point. The script sould contain generic library function that are use system wide, as it will be loaded with all page.|
-|superglobals | This can be used to preset PHP superglobals like $_SERVER['SERVER_NAME'] Any variable can be set, but will be overwriten, if the name is one of thouse that is set during request time.<br>The following variables are predefined and will be futher populated at request time:<br>
-    _POST
-    _GET
-    _FILES
-    _SERVER: SERVER_SOFTWARE, SERVER_NAME
-    _COOKIE|
+|superglobals | This can be used to preset PHP superglobals like $_SERVER['SERVER_NAME'] Any variable can be set, but will be overwriten, if the name is one of thouse that is set during request time.<br>The following variables are predefined and will be futher populated at request time:<br>    _POST<br>    _GET<br>    _FILES<br>    _SERVER: SERVER_SOFTWARE<br>    SERVER_NAME<br>    _COOKIE|
 
 ### Notes
 The aim of this project is to serve PHP scripts with the best response time possible. Another important functionality is integration with websocket and access to the express servers session data.
