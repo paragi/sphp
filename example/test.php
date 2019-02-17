@@ -1,12 +1,14 @@
 <?php
-  header('Location: http://localhost:8080/test.html');
+//setcookie("AAA", "value", -1, '/', ".domain.com")
+setcookie("AAA", "value", -1, '/', ".localhost");
+//setcookie("BAA", "other value", -1, '/', ".localhost");
+//  header('Location: http://localhost:8080/test.html');
 ?><!DOCTYPE HTML>
 <html>
 <head>
 <title>Test page</title>
 <link href="base.css" type="text/css" rel="stylesheet">
-<script type="text/JavaScript" src="plib.js"></script>
-<script type="text/JavaScript" src="chronos.js"></script>
+
 <style>
 </style>
 
@@ -88,7 +90,7 @@ $req['token']=false;
 
 //$req['fill']="sdkfjghsdjkfghsdlk vmhsdkfjlvnsdjæknvsdæjknbsdkjænbsjdfbnsdjkfbnksjdgnbskjdfnbsdnbkjsdnbvkjsdnbkjsdnbjksndfjkbnsdkjbnsdjkbnsdjkbnsdjbgnsd sjdfng sdfghsæ dhgj sdfgjsdh gæosjdghæosdhhhhhhhhhhhgasdnf æsdofngsædofdofgæsodfhgsæodfgsædo";
 
-sys_handler($req);
+//sys_handler($req);
 
 function sys_handler($req){
 

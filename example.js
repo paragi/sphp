@@ -1,9 +1,9 @@
 /*============================================================================*\
   Example of webserver using PHP and websockets served on the same port (80)
-  
+
   (c) Paragi Aps, Simon Riget 2015.
   Free to use, provided copyright note is preserved
-  
+
   This example is showing how to make a:
   * Snappy PHP serverside scripting
   * Websocket support, utilising PHP script to serve requests
@@ -12,7 +12,7 @@
   Sessions are created on a regular HTTP page request. The generated session are
   then used with the websocket request, identified by the same session ID cookie
 
-  Note: This example depends on the modules: express, ws express-session and 
+  Note: This example depends on the modules: express, ws express-session and
         body-parser:
 
         npm install express ws express-session body-parser
@@ -72,7 +72,7 @@ var sphpOptions = {
 app.use(expressSession(sessionOptions));
 
 // Save some session specific data
-app.use(function(request, response, next){ 
+app.use(function(request, response, next){
   request.session.ip=request.client.remoteAddress;
   next();
 });
@@ -88,10 +88,9 @@ app.use(sphp.express(sphpOptions));
 ws.on('connection',sphp.websocket(sessionOptions));
 
 // Setup html file server
-app.use(function(request, response, next){ 
-  if(request._parsedUrl.pathname == '/') 
+app.use(function(request, response, next){
+  if(request._parsedUrl.pathname == '/')
     request._parsedUrl.pathname='/example.html';
   next();
 });
 app.use(express.static(docRoot));
-
